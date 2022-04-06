@@ -5,6 +5,7 @@ FROM python:3.8-alpine3.15
 RUN   apk update && \
       apk --no-cache add \
       gcc \
+      tzdata \
       cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
       echo "Asia/Shanghai" > /etc/timezone && \
       apk del tzdata
