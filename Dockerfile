@@ -1,11 +1,20 @@
 ARG ALPINE_VER=3.13
 
-FROM python:3.8-alpine3.15
+FROM lsiobase/alpine:${ALPINE_VER}
 
 RUN   apk update && \
       apk --no-cache add \
-      gcc \
+      wget \
+      curl \
       tzdata \
+      musl-dev \
+      python3-dev \
+      libxml2-dev \
+      gcc \
+      libxslt-dev \
+      libffi-dev  \
+      alpine-sdk \
+      py3-pip && \
       cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
       echo "Asia/Shanghai" > /etc/timezone && \
       apk del tzdata
