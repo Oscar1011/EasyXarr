@@ -81,7 +81,7 @@ class Sonarr:
                                       self._monitored, self._season_folder, self._search_for_missing_episodes,
                                       self._unmet_search, self._series_type, self._tag)
                     Logger.success('添加成功')
-                    Push(Title='添加成功')
+                    Push(Message='👏添加成功')
                     return
             Push(Message='添加失败')
         except Exception:

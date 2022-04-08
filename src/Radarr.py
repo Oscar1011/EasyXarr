@@ -76,7 +76,7 @@ class Radarr:
                     radarr_movies.add(self._root_dir, self._quality_profile_id, self._monitored, self._search,
                                       self._minimum_availability, self._tag)
                     Logger.success('添加成功')
-                    Push(Message='添加成功')
+                    Push(Message=f'👏添加成功')
                     return
             Push(Message='添加失败')
         except Exception:
