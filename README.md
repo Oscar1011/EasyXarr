@@ -35,8 +35,8 @@ or
 菜单返回的内容点击也会自动添加。
 
 # 效果预览
-![basic](https://gitee.com/oscar1011/raw/raw/master/easyxarr/easyarr2.jpg)
-![basic](https://gitee.com/oscar1011/raw/raw/master/easyxarr/easyxarr1.png) 
+![basic](https://gitee.com/oscar1011/raw/raw/master/easyxarr/c9bfba2e983c2a37b05a9d948c5c5a6.jpg)
+![basic](https://gitee.com/oscar1011/raw/raw/master/easyxarr/f0c832f0ed47bf45add370d179e273c.jpg) 
 
 
 
