@@ -24,7 +24,9 @@ try:
     QWX_Token = Setting["EnterpriseWechat"]["Token"]
     QWX_EncodingAESKey = Setting["EnterpriseWechat"]["EncodingAESKey"]
     QWX_CorpID = Setting["EnterpriseWechat"]["CorpID"]
-    Push = Pusher.PushToEnterpriseWechat
+    WxHostApiKey = Setting["Others"]["WxHostApiKey"]
+
+    Push = Pusher.push_to_enterprise_wechat
     app = Flask(__name__)
     Logger.success("[主程序初始化]配置加载完成")
 except Exception:
@@ -36,21 +38,34 @@ except Exception:
 
 @app.route('/addMovie', methods=['GET', 'POST'])
 def addMovie():
-    tmdbId = request.args.get("tmdbId")
-    Logger.info(f'[添加剧集] tmdbId={tmdbId}')
-    t = threading.Thread(target=Radarr.add_movie, name="Thread-addMovie", kwargs={'tmdbId': tmdbId}, daemon=True)
-    t.start()
-    return '已请求添加'
+    try:
+        key = request.args.get("apikey")
+        if key != WxHostApiKey:
+            Logger.error(f'异常访问添加电影，请求 apikey 错误')
+            return ''
+        tmdbId = request.args.get("tmdbId")
+        Logger.info(f'[添加剧集] tmdbId={tmdbId}')
+        t = threading.Thread(target=Radarr.add_movie, name="Thread-addMovie", kwargs={'tmdbId': tmdbId}, daemon=True)
+        t.start()
+        return '已请求添加'
+    except:
+        return ''
 
 
 @app.route('/addSeries', methods=['GET', 'POST'])
 def addSeries():
-    tvdbId = request.args.get("tvdbId")
-    Logger.info(f'[添加剧集] tvdbId={tvdbId}')
-    t = threading.Thread(target=Sonarr.add_series, name="Thread-addSeries", kwargs={'tvdbId': tvdbId}, daemon=True)
-    t.start()
-    return '已请求添加'
-
+    try:
+        key = request.args.get("apikey")
+        if key != WxHostApiKey:
+            Logger.error(f'异常访问添加剧集，请求 apikey 错误')
+            return ''
+        tvdbId = request.args.get("tvdbId")
+        Logger.info(f'[添加剧集] tvdbId={tvdbId}')
+        t = threading.Thread(target=Sonarr.add_series, name="Thread-addSeries", kwargs={'tvdbId': tvdbId}, daemon=True)
+        t.start()
+        return '已请求添加'
+    except:
+        return ''
 
 
 # 响应企业微信

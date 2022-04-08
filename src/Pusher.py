@@ -26,7 +26,37 @@ except Exception:
     sys.exit(0)
 
 
-def PushToEnterpriseWechat(Type="text", Receiver="all", **kwargs):
+def push_search_result(info, **kwargs):
+    try:
+        Data = []
+        if not info or len(info) <= 0:
+            return
+        elif len(info) == 1:
+            Temp = {
+                'title': f'{info[0]["title"]}',
+                'url': info[0]["url"],
+                'picurl': info[0]["picurl"],
+                'description': f'介绍：{info[0]["overview"]}',
+            }
+            Data.append(Temp)
+        else:
+            for i in range(len(info)):
+                Temp = {
+                    'title': f'{i + 1}. {info[i]["title"]}',
+                    'url': info[i]["url"],
+                    'picurl': info[i]["picurl"]
+                }
+                Data.append(Temp)
+        push_to_enterprise_wechat("image_text", Articles=Data)
+
+    except Exception:
+        ExceptionInformation = sys.exc_info()
+        Text = f'[Sonarr]推送,异常信息为:{ExceptionInformation}'
+        Logger.error(Text)
+        return
+
+
+def push_to_enterprise_wechat(Type="text", Receiver="all", **kwargs):
     try:
         global CorpID, CorpSecret, AgentID, Manager, TokenApi, PushApi, PushTitle
         if Receiver == "all":
@@ -96,7 +126,7 @@ if __name__ == "__main__":
             Receiver, Title, Message = Message.split()
             flag = input("是否确定推送？(1/0):")
             if (flag == "1"):
-                PushToEnterpriseWechat("text", Receiver, Message=Message, Title=Title)
+                push_to_enterprise_wechat("text", Receiver, Message=Message, Title=Title)
             else:
                 Logger.info(f'[推送接口]取消推送')
         elif Type == "image_text":
@@ -105,7 +135,7 @@ if __name__ == "__main__":
             Articles = eval(Articles)
             flag = input("是否确定推送？(1/0):")
             if (flag == "1"):
-                PushToEnterpriseWechat("image_text", Receiver, Articles=Articles)
+                push_to_enterprise_wechat("image_text", Receiver, Articles=Articles)
             else:
                 Logger.info(f'[推送接口]取消推送')
         elif Type == "textcard":
@@ -114,7 +144,7 @@ if __name__ == "__main__":
             Textcard = dict(eval(Textcard))
             flag = input("是否确定推送？(1/0):")
             if (flag == "1"):
-                PushToEnterpriseWechat("textcard", Receiver, Textcard=Textcard)
+                push_to_enterprise_wechat("textcard", Receiver, Textcard=Textcard)
             else:
                 Logger.info(f'[推送接口]取消推送')
     except Exception:

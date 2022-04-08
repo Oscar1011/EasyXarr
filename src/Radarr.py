@@ -7,7 +7,8 @@ from arrapi import RadarrAPI
 import tmdbsimple as tmdb
 import Logger
 
-from Pusher import PushToEnterpriseWechat as Push
+from Pusher import push_to_enterprise_wechat as Push
+from Pusher import push_search_result
 
 
 class Radarr:
@@ -27,33 +28,31 @@ class Radarr:
     def __init__(self):
         with Radarr._lock:
             if not Radarr._init_flag:
-                self.load_config()
+                try:
+                    Logger.info("[Radarr初始化]正在加载配置")
+                    with open("config/Setting.yml", "r", encoding="utf-8") as f:
+                        Setting = yaml.safe_load(f)
+
+                    self._radarr = RadarrAPI(Setting["Radarr"]["Host"], Setting["Radarr"]["ApiKey"])
+                    self._root_dir = Setting["Radarr"]["RootDir"]
+                    self._quality_profile_id = Setting["Radarr"]["QualityProfileId"]
+                    self._monitored = Setting["Radarr"]["Monitored"]
+                    self._search = Setting["Radarr"]["Search"]
+                    self._minimum_availability = Setting["Radarr"]["MinimumAvailability"]
+                    self._tag = Setting["Radarr"]["Tag"]
+
+                    self._image_server = Setting["Others"]["ImageServer"]
+                    self._proxy = Setting["Others"]["Proxy"]
+                    self._tmdb_key = Setting["Others"]["TMDBApiKey"]
+                    self._wxhost = Setting["Others"]["WxHost"]
+                    self._wxhost_apikey = Setting["Others"]["WxHostApiKey"]
+
+                    Logger.success("[Radarr初始化]配置加载完成")
+                except Exception:
+                    ExceptionInformation = sys.exc_info()
+                    Text = f'[Radarr初始化异常]异常信息为:{ExceptionInformation}'
+                    Logger.error(Text)
                 Radarr._init_flag = True
-
-    def load_config(self):
-        try:
-            Logger.info("[Radarr初始化]正在加载配置")
-            with open("config/Setting.yml", "r", encoding="utf-8") as f:
-                Setting = yaml.safe_load(f)
-
-            self._radarr = RadarrAPI(Setting["Radarr"]["Host"], Setting["Radarr"]["ApiKey"])
-            self._root_dir = Setting["Radarr"]["RootDir"]
-            self._quality_profile_id = Setting["Radarr"]["QualityProfileId"]
-            self._monitored = Setting["Radarr"]["Monitored"]
-            self._search = Setting["Radarr"]["Search"]
-            self._minimum_availability = Setting["Radarr"]["MinimumAvailability"]
-            self._tag = Setting["Radarr"]["Tag"]
-
-            self._image_server = Setting["Others"]["ImageServer"]
-            self._proxy = Setting["Others"]["Proxy"]
-            self._tmdb_key = Setting["Others"]["TMDBApiKey"]
-            self._wxhost = Setting["Others"]["WxHost"]
-
-            Logger.success("[Radarr初始化]配置加载完成")
-        except Exception:
-            ExceptionInformation = sys.exc_info()
-            Text = f'[Radarr初始化异常]异常信息为:{ExceptionInformation}'
-            Logger.error(Text)
 
     @staticmethod
     def add_movie(tmdbId):
@@ -65,31 +64,31 @@ class Radarr:
 
     def _add_movies_internal(self, tmdbId: int):
         if self._is_running:
-            Logger.warning("Radarr正在搜索或添加电影")
             Push(Message='Radarr正在搜索或添加电影')
             return
         self._is_running = True
         try:
             radarr_movies = self._radarr.get_movie(tmdb_id=tmdbId)
             if radarr_movies:
+                movie = self.find_movie_by_tmdb(tmdbId)
                 if radarr_movies.added.year < 1990:
                     radarr_movies.add(self._root_dir, self._quality_profile_id, self._monitored, self._search,
                                       self._minimum_availability, self._tag)
-                    Logger.success('添加成功')
-                    Push(Message=f'👏添加成功')
-                    return
-            Push(Message='添加失败')
+                    Push(Message=f'👏添加【{movie["title"]}】成功')
+                else:
+                    Push(Message=f'🛑【{movie["title"]}】已在Radarr，请勿重复添加')
+            else:
+                Push(Message=f'Radarr未检索到该剧集 tmdb_id={tmdbId}')
         except Exception:
             ExceptionInformation = sys.exc_info()
             Text = f'[Radarr] 添加电影异常,异常信息为:{ExceptionInformation}'
-            Push(Message='添加失败')
+            Push(Message=f'🛑添加 tmdb_id={tmdbId} 失败')
             Logger.error(Text)
         finally:
             self._is_running = False
 
     def _search_internal(self, name: str):
         if self._is_running:
-            Logger.warning("Radarr正在搜索或添加电影")
             Push(Message='Radarr正在搜索或添加电影')
             return
         self._is_running = True
@@ -99,7 +98,7 @@ class Radarr:
             find_series = []
             if radarr_movies and len(radarr_movies) >= 1:
                 for movies in radarr_movies:
-                    tmdb_movies = self.find_tmdb_by_imdb(movies.imdbId)
+                    tmdb_movies = self.find_movie_by_imdb(movies.imdbId)
                     Logger.info(tmdb_movies)
                     if tmdb_movies and len(tmdb_movies) >= 1:
                         if tmdb_movies[0]["backdrop_path"] != 'None':
@@ -109,12 +108,12 @@ class Radarr:
                         else:
                             picurl = f'{self.get_remote_url(movies.images)}'
                         movies = {'title': tmdb_movies[0]['title'],
-                                  'url': f'{self._wxhost}/addMovie?tmdbId={movies.tmdbId}',
+                                  'url': f'{self._wxhost}/addMovie?apikey={self._wxhost_apikey}&tmdbId={movies.tmdbId}',
                                   'picurl': picurl,
                                   'overview': tmdb_movies[0]['overview']}
                         find_series.append(movies)
                         Logger.info(movies)
-                self.push_search_result(find_series)
+                push_search_result(find_series)
 
             return ''
         except Exception:
@@ -124,7 +123,13 @@ class Radarr:
         finally:
             self._is_running = False
 
-    def find_tmdb_by_imdb(self, imdb_id):
+    def find_movie_by_tmdb(self, tmdb_id):
+        tmdb.API_KEY = self._tmdb_key
+        info = tmdb.Movies(tmdb_id).info(language='zh')
+        Logger.info(info)
+        return info
+
+    def find_movie_by_imdb(self, imdb_id):
         tmdb.API_KEY = self._tmdb_key
         external_source = 'imdb_id'
         find = tmdb.Find(imdb_id)
@@ -138,33 +143,3 @@ class Radarr:
                 url = image.remoteUrl
         Logger.info(url)
         return url
-
-    def push_search_result(self, movies_info):
-        try:
-            Data = []
-            if not movies_info or len(movies_info) <= 0:
-                Push(Message='未搜索到电影')
-                return
-            elif len(movies_info) == 1:
-                Temp = {
-                    'title': f'{movies_info[0]["title"]}',
-                    'url': movies_info[0]["url"],
-                    'picurl': movies_info[0]["picurl"],
-                    'description': f'介绍：{movies_info[0]["overview"]}',
-                }
-                Data.append(Temp)
-            else:
-                for i in range(len(movies_info)):
-                    Temp = {
-                        'title': f'{i + 1}. {movies_info[i]["title"]}',
-                        'url': movies_info[i]["url"],
-                        'picurl': movies_info[i]["picurl"],
-                    }
-                    Data.append(Temp)
-            Push("image_text", Articles=Data)
-
-        except Exception:
-            ExceptionInformation = sys.exc_info()
-            Text = f'[Radarr]推送,异常信息为:{ExceptionInformation}'
-            Logger.error(Text)
-            return

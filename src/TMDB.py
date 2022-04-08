@@ -2,7 +2,7 @@ import sys
 
 import tmdbsimple as tmdb
 import yaml
-from Pusher import PushToEnterpriseWechat as Push
+from Pusher import push_search_result
 import Logger
 
 try:
@@ -13,6 +13,7 @@ try:
         tmdb.API_KEY = tmdb_key
         image_server = Setting["Others"]["ImageServer"]
         wxhost = Setting["Others"]["WxHost"]
+        wxhost_apikey = Setting["Others"]["WxHostApiKey"]
 
     Logger.success("[TMDB 初始化]配置加载完成")
 except Exception:
@@ -60,7 +61,7 @@ def _push_movies(movies):
         else:
             picurl = f'https://image.tmdb.org/t/p/original/{movies[i]["poster_path"]}'
         info = {'title': movies[i]['title'],
-                'url': f'{wxhost}/addMovie?tmdbId={movies[i]["id"]}',
+                'url': f'{wxhost}/addMovie?apikey={wxhost_apikey}&tmdbId={movies[i]["id"]}',
                 'picurl': picurl,
                 'overview': movies[i]['overview']}
         moviesinfo.append(info)
@@ -79,7 +80,7 @@ def _push_tv(tmdb_tv):
         else:
             picurl = f'https://image.tmdb.org/t/p/original/{tmdb_tv[i]["poster_path"]}'
         info = {'title': tmdb_tv[i]['name'],
-                'url': f'{wxhost}/addSeries?tvdbId={id_info["tvdb_id"]}',
+                'url': f'{wxhost}/addSeries?apikey={wxhost_apikey}&tvdbId={id_info["tvdb_id"]}',
                 'picurl': picurl,
                 'overview': tmdb_tv[i]['overview']}
         tv_info.append(info)
@@ -117,36 +118,6 @@ def tv_on_the_air():
     tv = tmdb.TV()
     Logger.info(tv.on_the_air(language='zh'))
     _push_tv(tv.results)
-
-
-def push_search_result(info):
-    try:
-        Data = []
-        if not info or len(info) <= 0:
-            return
-        elif len(info) == 1:
-            Temp = {
-                'title': f'{info[0]["title"]}',
-                'url': info[0]["url"],
-                'picurl': info[0]["picurl"],
-                'description': f'介绍：{info[0]["overview"]}',
-            }
-            Data.append(Temp)
-        else:
-            for i in range(len(info)):
-                Temp = {
-                    'title': f'{i + 1}. {info[i]["title"]}',
-                    'url': info[i]["url"],
-                    'picurl': info[i]["picurl"]
-                }
-                Data.append(Temp)
-        Push("image_text", Articles=Data)
-
-    except Exception:
-        ExceptionInformation = sys.exc_info()
-        Text = f'[Sonarr]推送,异常信息为:{ExceptionInformation}'
-        Logger.error(Text)
-        return
 
 
 def getTMDBInfo(type):
