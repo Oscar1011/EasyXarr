@@ -12,6 +12,7 @@ EnterpriseWechat:
 Others:
   #添加剧集/电影功能必须，微信服务后台的访问地址，格式 http(s)://xxx.xxx.xxx:port
   WxHost: ''
+  #添加剧集/电影时用于验证的秘钥。防止被人恶意操作，请修改为任意字符串
   WxHostApiKey: 'X5h*oF734F7n@$'
   #必须，TMDB的apikey，官网注册申请 https://www.themoviedb.org/
   TMDBApiKey: ''
