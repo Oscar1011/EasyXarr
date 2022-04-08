@@ -42,6 +42,7 @@ class Radarr:
             self._monitored = Setting["Radarr"]["Monitored"]
             self._search = Setting["Radarr"]["Search"]
             self._minimum_availability = Setting["Radarr"]["MinimumAvailability"]
+            self._tag = Setting["Radarr"]["Tag"]
 
             self._image_server = Setting["Others"]["ImageServer"]
             self._proxy = Setting["Others"]["Proxy"]
@@ -68,12 +69,12 @@ class Radarr:
             Push(Message='Radarr正在搜索或添加电影')
             return
         self._is_running = True
-        radarr_movies = self._radarr.get_movie(tmdb_id=tmdbId)
         try:
+            radarr_movies = self._radarr.get_movie(tmdb_id=tmdbId)
             if radarr_movies:
                 if radarr_movies.added.year < 1990:
                     radarr_movies.add(self._root_dir, self._quality_profile_id, self._monitored, self._search,
-                                      self._minimum_availability)
+                                      self._minimum_availability, self._tag)
                     Logger.success('添加成功')
                     Push(Message='添加成功')
                     return
@@ -120,7 +121,6 @@ class Radarr:
             ExceptionInformation = sys.exc_info()
             Text = f'[Radarr]运行异常,异常信息为:{ExceptionInformation}'
             Logger.error(Text)
-            return ''
         finally:
             self._is_running = False
 

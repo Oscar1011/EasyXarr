@@ -8,31 +8,39 @@ EnterpriseWechat:
   TokenApi: https://qyapi.weixin.qq.com/cgi-bin/gettoken
   PushApi: https://qyapi.weixin.qq.com/cgi-bin/message/send
 Others:
-  #此微信服务后台的访问地址，格式 http(s)://xxx.xxx.xxx:port
+  #添加剧集/电影功能必须，微信服务后台的访问地址，格式 http(s)://xxx.xxx.xxx:port
   WxHost: ''
   #必须，TMDB的apikey，官网注册申请 https://www.themoviedb.org/
   TMDBApiKey: ''
   #暂未使用
   Proxy: ''
-  #图片缓存服务，以便手机可以正常访问TVDB等网站的图片，格式 http(s)://xxx.xxx.xxx:port
+  #非必须，图片缓存服务，以便手机可以正常访问TVDB等网站的图片，格式 http(s)://xxx.xxx.xxx:port
   #访问 https://github.com/Oscar1011/image-server-node 进行配置
   #留空则会直接使用TMDB/TVDB等图片链接进行推送，国内网络环境可能无法加载显示
   ImageServer: ''
 Sonarr:
-  #Sonarr访问地址，格式 http(s)://xxx.xxx.xxx:port
+  #必须，Sonarr访问地址，格式 http(s)://xxx.xxx.xxx:port
   Host: ''
-  #Sonarr apikey
+  #必须，Sonarr apikey
   ApiKey: ''
-  #Sonarr添加剧集时的存放路径
+  #必须，Sonarr添加剧集时的存放路径
   RootDir: ''
   #影片质量，进入Settings->Profiles，支持配置为Quality Profiles对应name，如Any，不建议使用含空格的名称
   QualityProfileId: Any
+  #是否按季目录存放
   SeasonFolder: True
-  Monitored: True
+  #添加时的监控类型。支持以下选项  all, future, missing, existing, pilot, firstSeason, latestSeason, or none.
+  Monitored: all
   #语言参数，进入Settings->Profiles，支持配置为Language Profiles对应name，如English，不建议使用含空格的名称
   LanguageProfileId: English
   #添加时是否搜索缺少的剧集
   SearchForMissingEpisodes: True
+  #不知道干啥的配置
+  UnmetSearch: True
+  #剧集类型，无特殊需求默认即可，支持的值为 standard, daily, or anime
+  SeriesType: 'standard'
+  #添加时自动带上标签，请勿使用纯数字，多个tag 使用 逗号分开 如： [中文,微信]
+  Tag: []
 Radarr:
   #Radarr 访问地址，格式 http(s)://xxx.xxx.xxx:port
   Host: ''
@@ -40,10 +48,15 @@ Radarr:
   ApiKey: ''
   #影片质量，进入Settings->Profiles，支持配置为Quality Profiles对应name，如Any，不建议使用含空格的名称
   QualityProfileId: Any
+  #必须，Radarr 添加剧集时的存放路径
   RootDir: ''
+  #添加时是否开启监控
   Monitored: True
+  #添加时搜索
   Search: True
   MinimumAvailability: "announced"
+  #添加时自动带上标签，请勿使用纯数字，多个tag 使用 逗号分开 如： [中文,微信]
+  Tag: []
 Service:
   Host: 0.0.0.0
   #服务端口

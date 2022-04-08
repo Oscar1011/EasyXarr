@@ -43,6 +43,10 @@ class Sonarr:
             self._season_folder = Setting["Sonarr"]["SeasonFolder"]
             self._monitored = Setting["Sonarr"]["Monitored"]
             self._search_for_missing_episodes = Setting["Sonarr"]["SearchForMissingEpisodes"]
+            self._unmet_search = Setting["Sonarr"]["UnmetSearch"]
+            self._series_type = Setting["Sonarr"]["SeriesType"]
+
+            self._tag = Setting["Sonarr"]["Tag"]
 
             self._image_server = Setting["Others"]["ImageServer"]
             self._proxy = Setting["Others"]["Proxy"]
@@ -69,11 +73,13 @@ class Sonarr:
             Push(Message='Sonarr正在搜索或添加剧集')
             return
         self._is_running = True
-        sonarr_series = self._sonarr.get_series(tvdb_id=tvdbId)
         try:
+            sonarr_series = self._sonarr.get_series(tvdb_id=tvdbId)
             if sonarr_series:
                 if sonarr_series.added.year < 1990:
-                    sonarr_series.add(self._root_dir, self._quality_profile_id, self._language_profile_id, search=False)
+                    sonarr_series.add(self._root_dir, self._quality_profile_id, self._language_profile_id,
+                                      self._monitored, self._season_folder, self._search_for_missing_episodes,
+                                      self._unmet_search, self._series_type, self._tag)
                     Logger.success('添加成功')
                     Push(Title='添加成功')
                     return
