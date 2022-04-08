@@ -101,16 +101,16 @@ class Radarr:
                     tmdb_movies = self.find_tmdb_by_imdb(movies.imdbId)
                     Logger.info(tmdb_movies)
                     if tmdb_movies and len(tmdb_movies) >= 1:
-                        if self._image_server:
+                        if tmdb_movies[0]["backdrop_path"] != 'None':
+                            picurl = f'https://image.tmdb.org/t/p/original/{tmdb_movies[0]["backdrop_path"]}'
+                        elif self._image_server:
                             picurl = f'{self._image_server}/api?url={self.get_remote_url(movies.images)}&width=1068&height=455&format=webp'
                         else:
                             picurl = f'{self.get_remote_url(movies.images)}'
                         movies = {'title': tmdb_movies[0]['title'],
-                                'url': f'{self._wxhost}/addMovie?tmdbId={movies.tmdbId}',
-                                'picurl': picurl,
-                                'overview': tmdb_movies[0]['overview']}
-
-
+                                  'url': f'{self._wxhost}/addMovie?tmdbId={movies.tmdbId}',
+                                  'picurl': picurl,
+                                  'overview': tmdb_movies[0]['overview']}
                         find_series.append(movies)
                         Logger.info(movies)
                 self.push_search_result(find_series)
@@ -157,9 +157,8 @@ class Radarr:
                 for i in range(len(movies_info)):
                     Temp = {
                         'title': f'{i + 1}. {movies_info[i]["title"]}',
-                        'url': movies_info[0]["url"],
-                        'picurl': movies_info[0]["picurl"],
-                        'description': f'介绍：{movies_info[0]["overview"]}',
+                        'url': movies_info[i]["url"],
+                        'picurl': movies_info[i]["picurl"],
                     }
                     Data.append(Temp)
             Push("image_text", Articles=Data)

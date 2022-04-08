@@ -39,7 +39,7 @@ Radarr:
   #Radarr apikey
   ApiKey: ''
   #影片质量，进入Settings->Profiles，支持配置为Quality Profiles对应name，如Any，不建议使用含空格的名称
-  QualityProfileId: 1
+  QualityProfileId: Any
   RootDir: ''
   Monitored: True
   Search: True

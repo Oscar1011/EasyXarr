@@ -53,15 +53,16 @@ def movies_upcoming():
 
 def _push_movies(movies):
     moviesinfo = []
-    for movie in movies:
-        if image_server:
-            picurl = f'{image_server}/api?url=https://image.tmdb.org/t/p/original/{movie["backdrop_path"]}&width=1068&height=455&format=webp'
+    for i in range(len(movies)):
+        "poster_path': '/iUYrQyv0p4UncFolsROm81VNbcB.jpg'"
+        if i == 0 and movies[i]["backdrop_path"] != 'None':
+            picurl = f'https://image.tmdb.org/t/p/original/{movies[i]["backdrop_path"]}'
         else:
-            picurl = f'https://image.tmdb.org/t/p/original/{movie["backdrop_path"]}'
-        info = {'title': movie['title'],
-                'url': f'{wxhost}/addMovie?tmdbId={movie["id"]}',
+            picurl = f'https://image.tmdb.org/t/p/original/{movies[i]["poster_path"]}'
+        info = {'title': movies[i]['title'],
+                'url': f'{wxhost}/addMovie?tmdbId={movies[i]["id"]}',
                 'picurl': picurl,
-                'overview': movie['overview']}
+                'overview': movies[i]['overview']}
         moviesinfo.append(info)
     if len(moviesinfo) > 8:
         push_search_result(moviesinfo[0:8])
@@ -71,16 +72,16 @@ def _push_movies(movies):
 
 def _push_tv(tmdb_tv):
     tv_info = []
-    for tv in tmdb_tv:
-        id_info = tmdb.TV(tv["id"]).external_ids(language='zh')
-        if image_server:
-            picurl = f'{image_server}/api?url=https://image.tmdb.org/t/p/original/{tv["backdrop_path"]}&width=1068&height=455&format=webp'
+    for i in range(len(tmdb_tv)):
+        id_info = tmdb.TV(tmdb_tv[i]["id"]).external_ids(language='zh')
+        if i == 0 and tmdb_tv[i]["backdrop_path"] != 'None':
+            picurl = f'https://image.tmdb.org/t/p/original/{tmdb_tv[i]["backdrop_path"]}'
         else:
-            picurl = f'https://image.tmdb.org/t/p/original/{tv["backdrop_path"]}'
-        info = {'title': tv['name'],
+            picurl = f'https://image.tmdb.org/t/p/original/{tmdb_tv[i]["poster_path"]}'
+        info = {'title': tmdb_tv[i]['name'],
                 'url': f'{wxhost}/addSeries?tvdbId={id_info["tvdb_id"]}',
                 'picurl': picurl,
-                'overview': tv['overview']}
+                'overview': tmdb_tv[i]['overview']}
         tv_info.append(info)
     if len(tv_info) > 8:
         push_search_result(tv_info[0:8])
@@ -116,7 +117,6 @@ def tv_on_the_air():
     tv = tmdb.TV()
     Logger.info(tv.on_the_air(language='zh'))
     _push_tv(tv.results)
-
 
 
 def push_search_result(info):

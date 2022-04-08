@@ -101,7 +101,9 @@ class Sonarr:
                     tmdb_series = self.find_tmdb_by_imdb(series.imdbId)
                     Logger.info(tmdb_series)
                     if tmdb_series and len(tmdb_series) >= 1:
-                        if self._image_server:
+                        if tmdb_series[0]["backdrop_path"] != 'None':
+                            picurl = f'https://image.tmdb.org/t/p/original/{tmdb_series[0]["backdrop_path"]}'
+                        elif self._image_server:
                             picurl = f'{self._image_server}/api?url={self.get_remote_url(series.images)}&width=1068&height=455&format=webp'
                         else:
                             picurl = f'{self.get_remote_url(series.images)}'
