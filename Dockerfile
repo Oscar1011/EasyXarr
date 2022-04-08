@@ -18,6 +18,10 @@ RUN   apk update && \
       cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
       echo "Asia/Shanghai" > /etc/timezone && \
       apk del tzdata
- 
+
 COPY ./requirements.txt .
 RUN pip3 install --no-cache -r requirements.txt
+WORKDIR /app
+COPY /src /app
+
+CMD ["python3", "Main.py"]

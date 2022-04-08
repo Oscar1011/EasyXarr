@@ -2,8 +2,8 @@ requests
 gevent
 Flask
 loguru
-pyarr
 Werkzeug>=0.16.1
 tmdbsimple
 PyYAML
 pycryptodome==3.12.0
+arrapi
