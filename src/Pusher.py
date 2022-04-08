@@ -17,6 +17,7 @@ try:
     Manager = Setting["EnterpriseWechat"]["ManagerID"]
     TokenApi = Setting["EnterpriseWechat"]["TokenApi"]
     PushApi = Setting["EnterpriseWechat"]["PushApi"]
+    PushTitle = Setting["EnterpriseWechat"]["PushTitle"]
     Logger.success("[推送初始化]配置加载完成")
 except Exception:
     ExceptionInformation = sys.exc_info()
@@ -27,7 +28,7 @@ except Exception:
 
 def PushToEnterpriseWechat(Type="text", Receiver="all", **kwargs):
     try:
-        global CorpID, CorpSecret, AgentID, Manager, TokenApi, PushApi
+        global CorpID, CorpSecret, AgentID, Manager, TokenApi, PushApi, PushTitle
         if Receiver == "all":
             ToUser = "@all"
         elif Receiver == "manager":
@@ -39,7 +40,7 @@ def PushToEnterpriseWechat(Type="text", Receiver="all", **kwargs):
         AccessToken = {"access_token": requests.get(TokenApi, params=Key, timeout=5).json()['access_token']}
         if Type == "text":
             Time = time.strftime("%m{}%d{} %H:%M:%S").format('月', '日')
-            Message = f'[{kwargs.get("Title", "无标题")}]{Time}\n{kwargs.get("Message", "")}'
+            Message = f'[{kwargs.get("Title", PushTitle)}]{Time}\n{kwargs.get("Message", "")}'
             Data = {
                 "touser": ToUser,
                 "msgtype": "text",

@@ -7,6 +7,8 @@ EnterpriseWechat:
   ManagerID: '@all'
   TokenApi: https://qyapi.weixin.qq.com/cgi-bin/gettoken
   PushApi: https://qyapi.weixin.qq.com/cgi-bin/message/send
+  #推送时的默认title
+  PushTitle: 'EasyXArr'
 Others:
   #添加剧集/电影功能必须，微信服务后台的访问地址，格式 http(s)://xxx.xxx.xxx:port
   WxHost: ''
