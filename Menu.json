@@ -1,0 +1,54 @@
+{
+    "button": [
+        {
+            "name": "剧集",
+            "sub_button": [
+                {
+                    "type": "click",
+                    "name": "今日更新",
+                    "key": "tv_airing_today"
+                },
+                {
+                    "type": "click",
+                    "name": "最受欢迎",
+                    "key": "tv_popular"
+                },
+                {
+                    "type": "click",
+                    "name": "评分最高",
+                    "key": "tv_top_rated"
+                },
+                {
+                    "type": "click",
+                    "name": "即将更新",
+                    "key": "tv_on_the_air"
+                }
+            ]
+        },
+        {
+            "name": "电影",
+            "sub_button": [
+                {
+                    "type": "click",
+                    "name": "正在热播",
+                    "key": "movies_now_playing"
+                },
+                {
+                    "type": "click",
+                    "name": "最受欢迎",
+                    "key": "movies_popular"
+                },
+                {
+                    "type": "click",
+                    "name": "评分最高",
+                    "key": "movies_top_rated"
+                },
+                {
+                    "type": "click",
+                    "name": "即将上映",
+                    "key": "movies_upcoming"
+                }
+            ]
+        }
+    ]
+}
