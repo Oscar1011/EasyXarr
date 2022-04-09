@@ -93,7 +93,7 @@ class Sonarr:
         try:
             sonarr_series = self._sonarr.search_series(name)
             Logger.info(sonarr_series)
-            find_series = []
+            found_series = []
             if sonarr_series and len(sonarr_series) >= 1:
                 for series in sonarr_series:
                     tmdb_series = self.find_tv_by_imdb(series.imdbId)
@@ -108,10 +108,12 @@ class Sonarr:
                         series = {'title': f"{tmdb_series[0]['name']}",
                                   'picurl': picurl,
                                   'url': f'{WXHOST}/addSeries?apikey={WXHOST_APIKEY}&tvdbId={series.tvdbId}',
-                                  'overview': tmdb_series[0]['message']}
-                        find_series.append(series)
+                                  'message': tmdb_series[0]['overview']}
+                        found_series.append(series)
                         Logger.info(series)
-                push_image_text(find_series)
+                        if len(found_series) >= 8:
+                            break
+                push_image_text(found_series)
 
             return ''
         except Exception:

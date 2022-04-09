@@ -89,7 +89,7 @@ class Radarr:
         try:
             radarr_movies = self._radarr.search_movies(name)
             Logger.info(radarr_movies)
-            find_series = []
+            found_movies = []
             if radarr_movies and len(radarr_movies) >= 1:
                 for movies in radarr_movies:
                     tmdb_movies = self.find_movie_by_imdb(movies.imdbId)
@@ -105,9 +105,11 @@ class Radarr:
                                   'url': f'{WXHOST}/addMovie?apikey={WXHOST_APIKEY}&tmdbId={movies.tmdbId}',
                                   'picurl': picurl,
                                   'message': tmdb_movies[0]['overview']}
-                        find_series.append(movies)
+                        found_movies.append(movies)
                         Logger.info(movies)
-                push_image_text(find_series)
+                        if len(found_movies) >= 8:
+                            break
+                push_image_text(found_movies)
 
             return ''
         except Exception:
