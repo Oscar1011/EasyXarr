@@ -1,32 +1,14 @@
-import requests
-import time
 import json
 import sys
+import time
 
-import yaml
-from requests.models import Response
+import requests
+
 import Logger
-
-try:
-    Logger.info("[推送初始化]正在加载配置")
-    with open("config/Setting.yml", "r", encoding="utf-8") as f:
-        Setting = yaml.safe_load(f)
-    CorpID = Setting["EnterpriseWechat"]["CorpID"]
-    CorpSecret = Setting["EnterpriseWechat"]["CorpSecret"]
-    AgentID = Setting["EnterpriseWechat"]["AgentID"]
-    Manager = Setting["EnterpriseWechat"]["ManagerID"]
-    TokenApi = Setting["EnterpriseWechat"]["TokenApi"]
-    PushApi = Setting["EnterpriseWechat"]["PushApi"]
-    PushTitle = Setting["EnterpriseWechat"]["PushTitle"]
-    Logger.success("[推送初始化]配置加载完成")
-except Exception:
-    ExceptionInformation = sys.exc_info()
-    Text = f'[推送初始化异常]异常信息为:{ExceptionInformation}'
-    Logger.error(Text)
-    sys.exit(0)
+from Config import CorpID, CorpSecret, TokenApi, PushTitle, AgentID, PushApi, Manager
 
 
-def push_search_result(info, **kwargs):
+def push_image_text(info, **kwargs):
     try:
         Data = []
         if not info or len(info) <= 0:
@@ -36,7 +18,7 @@ def push_search_result(info, **kwargs):
                 'title': f'{info[0]["title"]}',
                 'url': info[0]["url"],
                 'picurl': info[0]["picurl"],
-                'description': f'介绍：{info[0]["overview"]}',
+                'description': f'{info[0]["message"]}',
             }
             Data.append(Temp)
         else:
@@ -58,7 +40,6 @@ def push_search_result(info, **kwargs):
 
 def push_to_enterprise_wechat(Type="text", Receiver="all", **kwargs):
     try:
-        global CorpID, CorpSecret, AgentID, Manager, TokenApi, PushApi, PushTitle
         if Receiver == "all":
             ToUser = "@all"
         elif Receiver == "manager":

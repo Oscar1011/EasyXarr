@@ -5,7 +5,6 @@ monkey.patch_all()
 
 import TMDB
 import threading
-import yaml
 from Sonarr import Sonarr
 from Radarr import Radarr
 from flask import Flask, request
@@ -13,58 +12,70 @@ import xml.etree.cElementTree as ET
 import sys
 from WXBizMsgCrypt import WXBizMsgCrypt
 import Logger
-import Pusher
+from XarrNotify import SonarrData, RadarrData
+import json
+from Config import WXHOST_APIKEY, QWX_Token, QWX_EncodingAESKey, CorpID, Host, Port
 
-try:
-    Logger.info("[主程序初始化]正在加载配置")
-    with open("config/Setting.yml", "r", encoding="utf-8") as f:
-        Setting = yaml.safe_load(f)
-    Host = Setting["Service"]["Host"]
-    Port = Setting["Service"]["Port"]
-    QWX_Token = Setting["EnterpriseWechat"]["Token"]
-    QWX_EncodingAESKey = Setting["EnterpriseWechat"]["EncodingAESKey"]
-    QWX_CorpID = Setting["EnterpriseWechat"]["CorpID"]
-    WxHostApiKey = Setting["Others"]["WxHostApiKey"]
-
-    Push = Pusher.push_to_enterprise_wechat
-    app = Flask(__name__)
-    Logger.success("[主程序初始化]配置加载完成")
-except Exception:
-    ExceptionInformation = sys.exc_info()
-    Text = f'[主程序初始化异常]异常信息为:{ExceptionInformation}'
-    Logger.error(Text)
-    sys.exit(0)
+app = Flask(__name__)
 
 
-@app.route('/addMovie', methods=['GET', 'POST'])
+@app.route('/XarrNotify', methods=['POST'])
+def XarrNotify():
+    try:
+        key = request.args.get("apikey")
+        if key != WXHOST_APIKEY:
+            Logger.error(f'异常访问，请求 apikey 错误')
+            return ''
+        arr_type = request.args.get("type")
+        data = json.loads(request.data)
+        if arr_type == 'sonarr':
+            Logger.info('sonarr')
+            SonarrData(data).exec()
+        elif arr_type == 'radarr':
+            RadarrData(data).exec()
+    except:
+        ExceptionInformation = sys.exc_info()
+        Text = f'[通知]运行异常,异常信息为:{ExceptionInformation}'
+        Logger.error(Text)
+        return ''
+    return ''
+
+
+@app.route('/addMovie', methods=['GET'])
 def addMovie():
     try:
         key = request.args.get("apikey")
-        if key != WxHostApiKey:
+        if key != WXHOST_APIKEY:
             Logger.error(f'异常访问添加电影，请求 apikey 错误')
             return ''
         tmdbId = request.args.get("tmdbId")
-        Logger.info(f'[添加剧集] tmdbId={tmdbId}')
-        t = threading.Thread(target=Radarr.add_movie, name="Thread-addMovie", kwargs={'tmdbId': tmdbId}, daemon=True)
+        Logger.info(f'[添加电影] tmdbId={tmdbId}')
+        t = threading.Thread(target=Radarr.add_movie, name="Thread-addMovie", kwargs={'tmdbId': tmdbId})
         t.start()
         return '已请求添加'
     except:
+        ExceptionInformation = sys.exc_info()
+        Text = f'[添加电影]异常,异常信息为:{ExceptionInformation}'
+        Logger.error(Text)
         return ''
 
 
-@app.route('/addSeries', methods=['GET', 'POST'])
+@app.route('/addSeries', methods=['GET'])
 def addSeries():
     try:
         key = request.args.get("apikey")
-        if key != WxHostApiKey:
+        if key != WXHOST_APIKEY:
             Logger.error(f'异常访问添加剧集，请求 apikey 错误')
             return ''
         tvdbId = request.args.get("tvdbId")
         Logger.info(f'[添加剧集] tvdbId={tvdbId}')
-        t = threading.Thread(target=Sonarr.add_series, name="Thread-addSeries", kwargs={'tvdbId': tvdbId}, daemon=True)
+        t = threading.Thread(target=Sonarr.add_series, name="Thread-addSeries", kwargs={'tvdbId': tvdbId})
         t.start()
         return '已请求添加'
     except:
+        ExceptionInformation = sys.exc_info()
+        Text = f'[添加剧集]异常,异常信息为:{ExceptionInformation}'
+        Logger.error(Text)
         return ''
 
 
@@ -77,7 +88,7 @@ def QWX():
             timestamp = request.args.get("timestamp")
             nonce = request.args.get("nonce")
             echostr = request.args.get("echostr")
-            QWX_Crypt = WXBizMsgCrypt(QWX_Token, QWX_EncodingAESKey, QWX_CorpID)
+            QWX_Crypt = WXBizMsgCrypt(QWX_Token, QWX_EncodingAESKey, CorpID)
             ret, result = QWX_Crypt.VerifyURL(msg_signature, timestamp, nonce, echostr)
             print(f"{ret}\n{result}")
             return result
@@ -87,7 +98,7 @@ def QWX():
         timestamp = request.args.get("timestamp")
         nonce = request.args.get("nonce")
         data = request.data
-        QWX_Crypt = WXBizMsgCrypt(QWX_Token, QWX_EncodingAESKey, QWX_CorpID)
+        QWX_Crypt = WXBizMsgCrypt(QWX_Token, QWX_EncodingAESKey, CorpID)
         ret, message = QWX_Crypt.DecryptMsg(data, msg_signature, timestamp, nonce)
         XmlTree = ET.fromstring(message)
         ToUser = XmlTree.find("FromUserName").text
@@ -99,7 +110,7 @@ def QWX():
                 EventKey = XmlTree.find("EventKey").text
                 Logger.info(EventKey)
                 if EventKey in TMDB.TMBD_FUNC_LIST:
-                    t = threading.Thread(target=TMDB.getTMDBInfo, name="TMDBHelper", kwargs={'type': EventKey}, daemon=True)
+                    t = threading.Thread(target=TMDB.getTMDBInfo, name="TMDBHelper", kwargs={'type': EventKey})
                     t.start()
 
         elif MsgType == 'text':
@@ -108,11 +119,11 @@ def QWX():
             if len(Content) == 2:
                 if Command == '电视剧':
                     name = Content[1]
-                    t = threading.Thread(target=Sonarr.search, name="Sonarr-search", kwargs={'name': name}, daemon=True)
+                    t = threading.Thread(target=Sonarr.search, name="Sonarr-search", kwargs={'name': name})
                     t.start()
                 elif Command == '电影':
                     name = Content[1]
-                    t = threading.Thread(target=Radarr.search, name="Radarr-search", kwargs={'name': name}, daemon=True)
+                    t = threading.Thread(target=Radarr.search, name="Radarr-search", kwargs={'name': name})
                     t.start()
         return ""
         # ---接收消息---

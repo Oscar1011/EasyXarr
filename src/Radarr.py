@@ -1,14 +1,14 @@
 import sys
 import threading
 
+import tmdbsimple as tmdb
 import yaml
 from arrapi import RadarrAPI
 
-import tmdbsimple as tmdb
 import Logger
-
+from Config import IMAGE_SERVER, WXHOST, WXHOST_APIKEY, TMDB_KEY
+from Pusher import push_image_text
 from Pusher import push_to_enterprise_wechat as Push
-from Pusher import push_search_result
 
 
 class Radarr:
@@ -40,12 +40,6 @@ class Radarr:
                     self._search = Setting["Radarr"]["Search"]
                     self._minimum_availability = Setting["Radarr"]["MinimumAvailability"]
                     self._tag = Setting["Radarr"]["Tag"]
-
-                    self._image_server = Setting["Others"]["ImageServer"]
-                    self._proxy = Setting["Others"]["Proxy"]
-                    self._tmdb_key = Setting["Others"]["TMDBApiKey"]
-                    self._wxhost = Setting["Others"]["WxHost"]
-                    self._wxhost_apikey = Setting["Others"]["WxHostApiKey"]
 
                     Logger.success("[Radarr初始化]配置加载完成")
                 except Exception:
@@ -103,17 +97,17 @@ class Radarr:
                     if tmdb_movies and len(tmdb_movies) >= 1:
                         if tmdb_movies[0]["backdrop_path"] != 'None':
                             picurl = f'https://image.tmdb.org/t/p/original/{tmdb_movies[0]["backdrop_path"]}'
-                        elif self._image_server:
-                            picurl = f'{self._image_server}/api?url={self.get_remote_url(movies.images)}&width=1068&height=455&format=webp'
+                        elif IMAGE_SERVER:
+                            picurl = f'{IMAGE_SERVER}/api?url={self.get_remote_url(movies.images)}&width=1068&height=455&format=webp'
                         else:
                             picurl = f'{self.get_remote_url(movies.images)}'
                         movies = {'title': tmdb_movies[0]['title'],
-                                  'url': f'{self._wxhost}/addMovie?apikey={self._wxhost_apikey}&tmdbId={movies.tmdbId}',
+                                  'url': f'{WXHOST}/addMovie?apikey={WXHOST_APIKEY}&tmdbId={movies.tmdbId}',
                                   'picurl': picurl,
-                                  'overview': tmdb_movies[0]['overview']}
+                                  'message': tmdb_movies[0]['overview']}
                         find_series.append(movies)
                         Logger.info(movies)
-                push_search_result(find_series)
+                push_image_text(find_series)
 
             return ''
         except Exception:
@@ -124,13 +118,13 @@ class Radarr:
             self._is_running = False
 
     def find_movie_by_tmdb(self, tmdb_id):
-        tmdb.API_KEY = self._tmdb_key
+        tmdb.API_KEY = TMDB_KEY
         info = tmdb.Movies(tmdb_id).info(language='zh')
         Logger.info(info)
         return info
 
     def find_movie_by_imdb(self, imdb_id):
-        tmdb.API_KEY = self._tmdb_key
+        tmdb.API_KEY = TMDB_KEY
         external_source = 'imdb_id'
         find = tmdb.Find(imdb_id)
         Logger.info(find.info(external_source=external_source, language='zh'))

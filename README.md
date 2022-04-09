@@ -34,6 +34,15 @@ or
 
 菜单返回的内容点击也会自动添加。
 
+# Sonarr/Radarr WebHook
+支持 sonarr/radarr 的下载通知 webhook，链接格式如下，apikey对应配置文件中的WxHostApiKey, type为sonarr或radarr
+
+    http(s)://xxx.xxx.xxx:port/XarrNotify?apikey={}&type={}
+如
+    
+    http://192.168.1.2:8989/XarrNotify?apikey=X5h*oF734F7n@$&type=sonarr
+
+
 # 效果预览
 ![basic](https://gitee.com/oscar1011/raw/raw/master/easyxarr/c9bfba2e983c2a37b05a9d948c5c5a6.jpg)
 ![basic](https://gitee.com/oscar1011/raw/raw/master/easyxarr/f0c832f0ed47bf45add370d179e273c.jpg) 

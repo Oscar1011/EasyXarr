@@ -1,14 +1,14 @@
 import sys
 import threading
 
+import tmdbsimple as tmdb
 import yaml
 from arrapi import SonarrAPI
 
-import tmdbsimple as tmdb
 import Logger
-
+from Config import IMAGE_SERVER, WXHOST, WXHOST_APIKEY, TMDB_KEY
+from Pusher import push_image_text
 from Pusher import push_to_enterprise_wechat as Push
-from Pusher import push_search_result
 
 
 class Sonarr:
@@ -42,15 +42,7 @@ class Sonarr:
                     self._search_for_missing_episodes = Setting["Sonarr"]["SearchForMissingEpisodes"]
                     self._unmet_search = Setting["Sonarr"]["UnmetSearch"]
                     self._series_type = Setting["Sonarr"]["SeriesType"]
-
                     self._tag = Setting["Sonarr"]["Tag"]
-
-                    self._image_server = Setting["Others"]["ImageServer"]
-                    self._proxy = Setting["Others"]["Proxy"]
-                    self._tmdb_key = Setting["Others"]["TMDBApiKey"]
-                    self._wxhost = Setting["Others"]["WxHost"]
-                    self._wxhost_apikey = Setting["Others"]["WxHostApiKey"]
-
                     Logger.success("[Sonarr初始化]配置加载完成")
                 except Exception:
                     ExceptionInformation = sys.exc_info()
@@ -109,17 +101,17 @@ class Sonarr:
                     if tmdb_series and len(tmdb_series) >= 1:
                         if tmdb_series[0]["backdrop_path"] != 'None':
                             picurl = f'https://image.tmdb.org/t/p/original/{tmdb_series[0]["backdrop_path"]}'
-                        elif self._image_server:
-                            picurl = f'{self._image_server}/api?url={self.get_remote_url(series.images)}&width=1068&height=455&format=webp'
+                        elif IMAGE_SERVER:
+                            picurl = f'{IMAGE_SERVER}/api?url={self.get_remote_url(series.images)}&width=1068&height=455&format=webp'
                         else:
                             picurl = f'{self.get_remote_url(series.images)}'
                         series = {'title': f"{tmdb_series[0]['name']}",
                                   'picurl': picurl,
-                                  'url': f'{self._wxhost}/addSeries?apikey={self._wxhost_apikey}&tvdbId={series.tvdbId}',
-                                  'overview': tmdb_series[0]['overview']}
+                                  'url': f'{WXHOST}/addSeries?apikey={WXHOST_APIKEY}&tvdbId={series.tvdbId}',
+                                  'overview': tmdb_series[0]['message']}
                         find_series.append(series)
                         Logger.info(series)
-                push_search_result(find_series)
+                push_image_text(find_series)
 
             return ''
         except Exception:
@@ -131,14 +123,14 @@ class Sonarr:
             self._is_running = False
 
     def find_tv_by_tvdb(self, tvdb_id):
-        tmdb.API_KEY = self._tmdb_key
+        tmdb.API_KEY = TMDB_KEY
         external_source = 'tvdb_id'
         find = tmdb.Find(tvdb_id)
         Logger.info(find.info(external_source=external_source, language='zh'))
         return find.tv_results
 
     def find_tv_by_imdb(self, imdb_id):
-        tmdb.API_KEY = self._tmdb_key
+        tmdb.API_KEY = TMDB_KEY
         external_source = 'imdb_id'
         find = tmdb.Find(imdb_id)
         Logger.info(find.info(external_source=external_source, language='zh'))

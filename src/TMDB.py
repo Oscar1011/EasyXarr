@@ -1,25 +1,10 @@
-import sys
-
 import tmdbsimple as tmdb
-import yaml
-from Pusher import push_search_result
+
+from Config import WXHOST_APIKEY, WXHOST, TMDB_KEY
+from Pusher import push_image_text
 import Logger
 
-try:
-    Logger.info("[TMDB 初始化]正在加载配置")
-    with open("config/Setting.yml", "r", encoding="utf-8") as f:
-        Setting = yaml.safe_load(f)
-        tmdb_key = Setting["Others"]["TMDBApiKey"]
-        tmdb.API_KEY = tmdb_key
-        image_server = Setting["Others"]["ImageServer"]
-        wxhost = Setting["Others"]["WxHost"]
-        wxhost_apikey = Setting["Others"]["WxHostApiKey"]
-
-    Logger.success("[TMDB 初始化]配置加载完成")
-except Exception:
-    ExceptionInformation = sys.exc_info()
-    Text = f'[TMDB 初始化异常]异常信息为:{ExceptionInformation}'
-    Logger.error(Text)
+tmdb.API_KEY = TMDB_KEY
 
 
 def movies_now_playing():
@@ -61,14 +46,14 @@ def _push_movies(movies):
         else:
             picurl = f'https://image.tmdb.org/t/p/original/{movies[i]["poster_path"]}'
         info = {'title': movies[i]['title'],
-                'url': f'{wxhost}/addMovie?apikey={wxhost_apikey}&tmdbId={movies[i]["id"]}',
+                'url': f'{WXHOST}/addMovie?apikey={WXHOST_APIKEY}&tmdbId={movies[i]["id"]}',
                 'picurl': picurl,
-                'overview': movies[i]['overview']}
+                'message': movies[i]['overview']}
         moviesinfo.append(info)
     if len(moviesinfo) > 8:
-        push_search_result(moviesinfo[0:8])
+        push_image_text(moviesinfo[0:8])
     else:
-        push_search_result(moviesinfo)
+        push_image_text(moviesinfo)
 
 
 def _push_tv(tmdb_tv):
@@ -80,14 +65,14 @@ def _push_tv(tmdb_tv):
         else:
             picurl = f'https://image.tmdb.org/t/p/original/{tmdb_tv[i]["poster_path"]}'
         info = {'title': tmdb_tv[i]['name'],
-                'url': f'{wxhost}/addSeries?apikey={wxhost_apikey}&tvdbId={id_info["tvdb_id"]}',
+                'url': f'{WXHOST}/addSeries?apikey={WXHOST_APIKEY}&tvdbId={id_info["tvdb_id"]}',
                 'picurl': picurl,
-                'overview': tmdb_tv[i]['overview']}
+                'message': tmdb_tv[i]['overview']}
         tv_info.append(info)
     if len(tv_info) > 8:
-        push_search_result(tv_info[0:8])
+        push_image_text(tv_info[0:8])
     else:
-        push_search_result(tv_info)
+        push_image_text(tv_info)
 
 
 def tv_airing_today():
