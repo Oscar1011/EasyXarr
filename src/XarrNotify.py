@@ -34,9 +34,11 @@ def push_msg_from_detail(detail, title_prefix=''):
     if detail.get('indexer'):
         msg += '\n抓取来源：' + detail['indexer']
 
-    info = {'title': f'{title_prefix}{title}',
+    info = [{'title': f'{title_prefix}{title}',
             'picurl': detail.get('backUrl', ''),
-            'message': msg}
+            'url': '',
+            'message': msg}]
+    Logger.info(info)
     push_image_text(info)
 
 
