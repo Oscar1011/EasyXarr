@@ -25,8 +25,8 @@ def push_msg_from_detail(detail, title_prefix=''):
         msg += '视频质量：' + detail['quality']
     if detail.get('size'):
         msg += '\n视频大小：' + HRS(int(detail['size']))
-    if detail.get('path'):
-        msg += '\n文件路径：' + detail['path']
+    # if detail.get('path'):
+    #     msg += '\n文件路径：' + detail['path']
     if detail.get('isUpgrade'):
         msg += '\n格式升级：' + ('是' if 'True' == detail['isUpgrade'] else '否')
     if detail.get('deletedFiles'):
@@ -35,9 +35,9 @@ def push_msg_from_detail(detail, title_prefix=''):
         msg += '\n抓取来源：' + detail['indexer']
 
     info = [{'title': f'{title_prefix}{title}',
-            'picurl': detail.get('backUrl', ''),
-            'url': '',
-            'message': msg}]
+             'picurl': detail.get('backUrl', ''),
+             'url': '',
+             'message': msg}]
     Logger.info(info)
     push_image_text(info)
 
@@ -90,6 +90,10 @@ class SonarrData:
             self._detail['releaseTitle'] = event['release'].get('releaseTitle')
             self._detail['indexer'] = event['release'].get('indexer')
             self._detail['quality'] = event['release'].get('quality')
+        if event.get('episodeFile'):
+            self._detail['size'] = event['episodeFile'].get('size')
+            self._detail['releaseGroup'] = event['episodeFile'].get('releaseGroup')
+            self._detail['quality'] = event['episodeFile'].get('quality')
         self._detail['isUpgrade'] = event.get('isUpgrade')
         self._detail['deletedFiles'] = event.get('deletedFiles')
         if self._detail.get('imdbId'):
@@ -180,7 +184,8 @@ class RadarrData:
             find.info(external_source='imdb_id', language='zh')
             if len(find.movie_results) > 0:
                 self._detail['title'] = find.movie_results[0]['title']
-                self._detail['backUrl'] = f'https://image.tmdb.org/t/p/original/{find.movie_results[0]["backdrop_path"]}'
+                self._detail[
+                    'backUrl'] = f'https://image.tmdb.org/t/p/original/{find.movie_results[0]["backdrop_path"]}'
 
     def grab(self):
         push_msg_from_detail(self._detail, self.title_prefix.get(self._detail.get('eventType')))
