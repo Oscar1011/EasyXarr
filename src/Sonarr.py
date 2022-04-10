@@ -1,5 +1,7 @@
+import logging
 import sys
 import threading
+from datetime import datetime
 
 import tmdbsimple as tmdb
 import yaml
@@ -16,7 +18,7 @@ class Sonarr:
     _lock = threading.Lock()
     _init_flag = False
     _is_running = False
-    _last_search_time = 0
+    _last_search_time = datetime.now()
     _status = '未运行'
 
     def __new__(cls, *args, **kwargs):
@@ -58,16 +60,32 @@ class Sonarr:
     def search(name):
         Sonarr()._search_internal(name)
 
+    def is_exist(self, tvdb_id=None):
+        try:
+            Logger.info(f' ?????????? {tvdb_id}')
+            series = self._sonarr.get_series(tvdb_id=tvdb_id)
+            if series.id is not None:
+                return True
+        except Exception as e:
+            logging.exception(e)
+            return False
+        return False
+
     def _add_series_internal(self, tvdbId: int):
         if self._is_running:
             Push(Message='Sonarr正在搜索或添加剧集')
             return
         self._is_running = True
         try:
+            interval = datetime.now() - self._last_search_time
+            if interval.total_seconds() > 1800:
+                Logger.error('距上次搜索间隔时间太久，请重新搜索后尝试添加')
+                Push(Message='🛑距上次搜索间隔时间太久，请重新搜索后尝试添加')
+                return
             sonarr_series = self._sonarr.get_series(tvdb_id=tvdbId)
             if sonarr_series:
                 tv = self.find_tv_by_tvdb(tvdbId)
-                if sonarr_series.added.year < 1990:
+                if sonarr_series.id is None:
                     sonarr_series.add(self._root_dir, self._quality_profile_id, self._language_profile_id,
                                       self._monitored, self._season_folder, self._search_for_missing_episodes,
                                       self._unmet_search, self._series_type, self._tag)
@@ -105,7 +123,7 @@ class Sonarr:
                             picurl = f'{IMAGE_SERVER}/api?url={self.get_remote_url(series.images)}&width=1068&height=455&format=webp'
                         else:
                             picurl = f'{self.get_remote_url(series.images)}'
-                        series = {'title': f"{tmdb_series[0]['name']}",
+                        series = {'title': f"{tmdb_series[0]['name']} {'(❎未入库)' if series.id is None else '(✅已入库)'}",
                                   'picurl': picurl,
                                   'url': f'{WXHOST}/addSeries?apikey={WXHOST_APIKEY}&tvdbId={series.tvdbId}',
                                   'message': tmdb_series[0]['overview']}
@@ -114,13 +132,14 @@ class Sonarr:
                         if len(found_series) >= 8:
                             break
                 push_image_text(found_series)
-
-            return ''
+                self._last_search_time = datetime.now()
+            else:
+                Push(Message=f'未搜索到电视剧【{name}】')
         except Exception:
             ExceptionInformation = sys.exc_info()
             Text = f'[sonarr]运行异常,异常信息为:{ExceptionInformation}'
+            Push(Message=f'搜索【{name}】时出现异常，请查看日志检查错误')
             Logger.error(Text)
-            return ''
         finally:
             self._is_running = False
 

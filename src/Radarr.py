@@ -1,5 +1,7 @@
+import logging
 import sys
 import threading
+from datetime import datetime
 
 import tmdbsimple as tmdb
 import yaml
@@ -16,7 +18,7 @@ class Radarr:
     _lock = threading.Lock()
     _init_flag = False
     _is_running = False
-    _last_search_time = 0
+    _last_search_time = datetime.now()
     _status = '未运行'
 
     def __new__(cls, *args, **kwargs):
@@ -56,16 +58,32 @@ class Radarr:
     def search(name):
         Radarr()._search_internal(name)
 
+    def is_exist(self, tmdb_id=None, imdb_id=None):
+        try:
+            movie = self._radarr.get_movie(tmdb_id=tmdb_id, imdb_id=imdb_id)
+            Logger.info(f'is_exist ???? {movie}')
+            if movie.id is not None:
+                return True
+        except Exception as e:
+            logging.exception(e)
+            return False
+        return False
+
     def _add_movies_internal(self, tmdbId: int):
         if self._is_running:
             Push(Message='Radarr正在搜索或添加电影')
             return
         self._is_running = True
         try:
+            interval = datetime.now() - self._last_search_time
+            if interval.total_seconds() > 1800:
+                Logger.error('距上次搜索间隔时间太久，请重新搜索后尝试添加')
+                Push(Message='🛑距上次搜索间隔时间太久，请重新搜索后尝试添加')
+                return
             radarr_movies = self._radarr.get_movie(tmdb_id=tmdbId)
             if radarr_movies:
                 movie = self.find_movie_by_tmdb(tmdbId)
-                if radarr_movies.added.year < 1990:
+                if radarr_movies.id is None:
                     radarr_movies.add(self._root_dir, self._quality_profile_id, self._monitored, self._search,
                                       self._minimum_availability, self._tag)
                     Push(Message=f'👏添加【{movie["title"]}】成功')
@@ -101,20 +119,23 @@ class Radarr:
                             picurl = f'{IMAGE_SERVER}/api?url={self.get_remote_url(movies.images)}&width=1068&height=455&format=webp'
                         else:
                             picurl = f'{self.get_remote_url(movies.images)}'
-                        movies = {'title': tmdb_movies[0]['title'],
-                                  'url': f'{WXHOST}/addMovie?apikey={WXHOST_APIKEY}&tmdbId={movies.tmdbId}',
-                                  'picurl': picurl,
-                                  'message': tmdb_movies[0]['overview']}
-                        found_movies.append(movies)
-                        Logger.info(movies)
+                        info = {'title': f"{tmdb_movies[0]['title']} {'(❎未入库)' if movies.id is None else '(✅已入库)'}",
+                                'url': f'{WXHOST}/addMovie?apikey={WXHOST_APIKEY}&tmdbId={movies.tmdbId}',
+                                'picurl': picurl,
+                                'message': tmdb_movies[0]['overview']}
+                        found_movies.append(info)
+                        Logger.info(info)
                         if len(found_movies) >= 8:
                             break
                 push_image_text(found_movies)
-
+                self._last_search_time = datetime.now()
+            else:
+                Push(Message=f'未搜索到电影【{name}】')
             return ''
         except Exception:
             ExceptionInformation = sys.exc_info()
             Text = f'[Radarr]运行异常,异常信息为:{ExceptionInformation}'
+            Push(Message=f'搜索【{name}】时出现异常，请查看日志检查错误')
             Logger.error(Text)
         finally:
             self._is_running = False
