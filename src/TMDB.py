@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import tmdbsimple as tmdb
 
 import Logger
@@ -98,6 +100,7 @@ def _push_movies(movies):
         push_image_text(moviesinfo[0:8])
     else:
         push_image_text(moviesinfo)
+    Radarr._last_search_time = datetime.now()
 
 
 def _push_tv(tmdb_tv):
@@ -123,6 +126,7 @@ def _push_tv(tmdb_tv):
         push_image_text(tv_info[0:8])
     else:
         push_image_text(tv_info)
+    Sonarr._last_search_time = datetime.now()
 
 
 def tv_airing_today():
