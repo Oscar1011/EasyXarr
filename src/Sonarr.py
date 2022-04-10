@@ -123,10 +123,11 @@ class Sonarr:
                             picurl = f'{IMAGE_SERVER}/api?url={self.get_remote_url(series.images)}&width=1068&height=455&format=webp'
                         else:
                             picurl = f'{self.get_remote_url(series.images)}'
-                        series = {'title': f"{tmdb_series[0]['name']} {'(❎未入库)' if series.id is None else '(✅已入库)'}",
-                                  'picurl': picurl,
-                                  'url': f'{WXHOST}/addSeries?apikey={WXHOST_APIKEY}&tvdbId={series.tvdbId}',
-                                  'message': tmdb_series[0]['overview']}
+                        series = {
+                            'title': f"{tmdb_series[0]['name']}\n🔸{tmdb_series[0]['vote_average'] if tmdb_series[0]['vote_count'] > 10 else '暂无评'}分 {'| ✅已入库' if series.id is None else '| ❎未入库'}",
+                            'picurl': picurl,
+                            'url': f'{WXHOST}/addSeries?apikey={WXHOST_APIKEY}&tvdbId={series.tvdbId}',
+                            'message': tmdb_series[0]['overview']}
                         found_series.append(series)
                         Logger.info(series)
                         if len(found_series) >= 8:

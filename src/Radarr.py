@@ -119,10 +119,12 @@ class Radarr:
                             picurl = f'{IMAGE_SERVER}/api?url={self.get_remote_url(movies.images)}&width=1068&height=455&format=webp'
                         else:
                             picurl = f'{self.get_remote_url(movies.images)}'
-                        info = {'title': f"{tmdb_movies[0]['title']} {'(❎未入库)' if movies.id is None else '(✅已入库)'}",
-                                'url': f'{WXHOST}/addMovie?apikey={WXHOST_APIKEY}&tmdbId={movies.tmdbId}',
-                                'picurl': picurl,
-                                'message': tmdb_movies[0]['overview']}
+
+                        info = {
+                            'title': f"{tmdb_movies[0]['title']}\n🔸{tmdb_movies[0]['vote_average'] if tmdb_movies[0]['vote_count'] > 10 else '暂无评'}分 {'| ✅已入库' if movies.id is None else '| ❎未入库'}",
+                            'url': f'{WXHOST}/addMovie?apikey={WXHOST_APIKEY}&tmdbId={movies.tmdbId}',
+                            'picurl': picurl,
+                            'message': tmdb_movies[0]['overview']}
                         found_movies.append(info)
                         Logger.info(info)
                         if len(found_movies) >= 8:
