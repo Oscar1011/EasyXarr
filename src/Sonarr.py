@@ -62,7 +62,6 @@ class Sonarr:
 
     def is_exist(self, tvdb_id=None):
         try:
-            Logger.info(f' ?????????? {tvdb_id}')
             series = self._sonarr.get_series(tvdb_id=tvdb_id)
             if series.id is not None:
                 return True

@@ -61,7 +61,6 @@ class Radarr:
     def is_exist(self, tmdb_id=None, imdb_id=None):
         try:
             movie = self._radarr.get_movie(tmdb_id=tmdb_id, imdb_id=imdb_id)
-            Logger.info(f'is_exist ???? {movie}')
             if movie.id is not None:
                 return True
         except Exception as e:

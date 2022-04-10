@@ -1,40 +1,42 @@
 ==============================
 
 MOVIE
-Action          28
-Adventure       12
-Animation       16
-Comedy          35
-Crime           80
-Documentary     99
-Drama           18
-Family          10751
-Fantasy         14
-History         36
-Horror          27
-Music           10402
-Mystery         9648
-Romance         10749
-Science Fiction 878
-TV Movie        10770
-Thriller        53
-War             10752
-Western         37
+行动	    28	    Action
+冒险	    12	    Adventure
+动画	    16	    Animation
+喜剧	    35	    Comedy
+犯罪	    80	    Crime
+纪录片	99	    Documentary
+戏剧	    18	    Drama
+家庭	    10751	Family
+幻想	    14	    Fantasy
+历史	    36	    History
+恐怖	    27	    Horror
+音乐	    10402	Music
+神秘	    9648	Mystery
+浪漫	    10749	Romance
+科幻小说	878	    Science Fiction
+电视电影	10770	TV Movie
+惊悚片	53	    Thriller
+战争	    10752	War
+西部	    37	    Western
+
+
 ==============================
 TV SHOW
-Action & Adventure  10759
-Animation           16
-Comedy              35
-Crime               80
-Documentary         99
-Drama               18
-Family              10751
-Kids                10762
-Mystery             9648
-News                10763
-Reality             10764
-Sci-Fi & Fantasy    10765
-Soap                10766
-Talk                10767
-War & Politics      10768
-Western             37
+动作与冒险	10759	Action & Adventure
+动画	        16	    Animation
+喜剧  	    35	    Comedy
+犯罪	        80	    Crime
+纪录片	    99	    Documentary
+戏剧	        18	    Drama
+家庭	        10751	Family
+儿童	        10762	Kids
+神秘	        9648	Mystery
+新闻	        10763	News
+现实	        10764	Reality
+科幻与奇幻	10765	Sci-Fi & Fantasy
+肥皂	        10766	Soap
+脱口秀       10767	Talk
+战争与政治	10768	War & Politics
+西部	        37	    Western

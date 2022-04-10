@@ -25,9 +25,10 @@ try:
     WXHOST_APIKEY = Setting["Others"]["WxHostApiKey"]
     TMDB_KEY = Setting["Others"]["TMDBApiKey"]
 
-    PREFER_LANGUAGE = Setting["Others"]["PreferLanguage"]
-    PREFER_GENRE_ID = Setting["Others"]["PreferGenreId"]
-
+    TV_PREFER_LANGUAGE = Setting["TMDB"]["TVPreferLanguage"]
+    TV_PREFER_GENRE_ID = Setting["TMDB"]["TVPreferGenreId"]
+    MOVIES_PREFER_LANGUAGE = Setting["TMDB"]["MoviesPreferLanguage"]
+    MOVIES_PREFER_GENRE_ID = Setting["TMDB"]["MoviesPreferGenreId"]
     Logger.success("[主程序初始化]配置加载完成")
 except Exception:
     ExceptionInformation = sys.exc_info()

@@ -22,10 +22,15 @@ Others:
   #访问 https://github.com/Oscar1011/image-server-node 进行配置
   #留空则会直接使用TMDB/TVDB等图片链接进行推送，国内网络环境可能无法加载显示
   ImageServer: ''
+TMDB:
   #获取各榜单时过滤的偏好影片语言，不配置则不过滤，如 {zh,en}, 其他语言请搜索 ISO 639-1，根据列表增加即可
-  PreferLanguage: {}
+  TVPreferLanguage: { }
   #获取各榜单时过滤的偏好影片类型，类型id请对应 GENRE_ID_LIST.txt文件配置，不配置则不过滤， 如 {28,12,16,80}
-  PreferGenreId: {}
+  TVPreferGenreId: { }
+  #获取各榜单时过滤的偏好影片语言，不配置则不过滤，如 {zh,en}, 其他语言请搜索 ISO 639-1，根据列表增加即可
+  MoviesPreferLanguage: { }
+  #获取各榜单时过滤的偏好影片类型，类型id请对应 GENRE_ID_LIST.txt文件配置，不配置则不过滤， 如 {28,12,16,80}
+  MoviesPreferGenreId: { }
 Sonarr:
   #必须，Sonarr访问地址，格式 http(s)://xxx.xxx.xxx:port
   Host: ''

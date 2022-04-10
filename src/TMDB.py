@@ -1,37 +1,40 @@
 import tmdbsimple as tmdb
 
 import Logger
-from Config import WXHOST_APIKEY, WXHOST, TMDB_KEY, PREFER_LANGUAGE, PREFER_GENRE_ID
+from Config import WXHOST_APIKEY, WXHOST, TMDB_KEY, TV_PREFER_LANGUAGE, TV_PREFER_GENRE_ID, MOVIES_PREFER_LANGUAGE, \
+    MOVIES_PREFER_GENRE_ID
 from Pusher import push_image_text
 from Radarr import Radarr
 from Sonarr import Sonarr
 
 tmdb.API_KEY = TMDB_KEY
 
+TV = 1
+MOVIE = 2
 
 def movies_now_playing():
     movies = tmdb.Movies()
-    _push_movies(get_list(movies.now_playing))
+    _push_movies(get_list(movies.now_playing, MOVIE))
 
 
 def movies_popular():
     movies = tmdb.Movies()
-    _push_movies(get_list(movies.popular))
+    _push_movies(get_list(movies.popular, MOVIE))
 
 
 def movies_latest():
     movies = tmdb.Movies()
-    _push_movies(get_list(movies.latest))
+    _push_movies(get_list(movies.latest, MOVIE))
 
 
 def movies_top_rated():
     movies = tmdb.Movies()
-    _push_movies(get_list(movies.top_rated))
+    _push_movies(get_list(movies.top_rated, MOVIE))
 
 
 def movies_upcoming():
     movies = tmdb.Movies()
-    _push_movies(get_list(movies.upcoming))
+    _push_movies(get_list(movies.upcoming, MOVIE))
 
 
 def movies_discover():
@@ -39,28 +42,37 @@ def movies_discover():
     discover.movie()
 
 
-def get_list(fun):
-    result_movies = []
-    movies = fun(language='zh')
-    Logger.info(movies)
-    result_movies.extend(filter_list(movies['results']))
-    if len(result_movies) >= 8:
-        return result_movies
-    for i in range(1, movies['total_pages']):
-        movies = fun(language='zh', page=i + 1)
-        Logger.info(movies)
-        result_movies.extend(filter_list(movies['results']))
-        if len(result_movies) >= 8:
-            return result_movies
+def get_list(fun, type: int):
+    prefer_language = None
+    prefer_genre_id = None
+    if type == TV:
+        prefer_language = TV_PREFER_LANGUAGE
+        prefer_genre_id = TV_PREFER_GENRE_ID
+    elif type == MOVIE:
+        prefer_language = MOVIES_PREFER_LANGUAGE
+        prefer_genre_id = MOVIES_PREFER_GENRE_ID
+
+    results = []
+    tmdb_list = fun(language='zh')
+    Logger.info(tmdb_list)
+    results.extend(filter_list(tmdb_list['results'], prefer_language, prefer_genre_id))
+    if len(results) >= 8:
+        return results
+    for i in range(1, tmdb_list['total_pages']):
+        tmdb_list = fun(language='zh', page=i + 1)
+        Logger.info(tmdb_list)
+        results.extend(filter_list(tmdb_list['results'], prefer_language, prefer_genre_id))
+        if len(results) >= 8:
+            return results
 
 
-def filter_list(tmdb_list):
-    if PREFER_LANGUAGE and len(PREFER_LANGUAGE) > 0:
-        lambda_filter = lambda x: x['original_language'] in PREFER_LANGUAGE
+def filter_list(tmdb_list, prefer_language, prefer_genre_id):
+    if prefer_language and len(prefer_language) > 0:
+        lambda_filter = lambda x: x['original_language'] in prefer_language
         tmplist = filter(lambda_filter, tmdb_list)
         tmdb_list = list(tmplist)
-    if PREFER_GENRE_ID and len(PREFER_GENRE_ID) > 0:
-        lambda_filter = lambda x: not set(x['genre_ids']).isdisjoint(PREFER_GENRE_ID)
+    if prefer_genre_id and len(prefer_genre_id) > 0:
+        lambda_filter = lambda x: not set(x['genre_ids']).isdisjoint(prefer_genre_id)
         tmplist = filter(lambda_filter, tmdb_list)
         tmdb_list = list(tmplist)
     return tmdb_list
@@ -115,27 +127,27 @@ def _push_tv(tmdb_tv):
 
 def tv_airing_today():
     tv = tmdb.TV()
-    _push_tv(get_list(tv.airing_today))
+    _push_tv(get_list(tv.airing_today, TV))
 
 
 def tv_popular():
     tv = tmdb.TV()
-    _push_tv(get_list(tv.popular))
+    _push_tv(get_list(tv.popular, TV))
 
 
 def tv_latest():
     tv = tmdb.TV()
-    _push_tv(get_list(tv.latest))
+    _push_tv(get_list(tv.latest, TV))
 
 
 def tv_top_rated():
     tv = tmdb.TV()
-    _push_tv(get_list(tv.top_rated))
+    _push_tv(get_list(tv.top_rated, TV))
 
 
 def tv_on_the_air():
     tv = tmdb.TV()
-    _push_tv(get_list(tv.on_the_air))
+    _push_tv(get_list(tv.on_the_air, TV))
 
 
 def getTMDBInfo(type):
