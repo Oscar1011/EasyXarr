@@ -43,7 +43,6 @@ def push_msg_from_detail(detail, title_prefix=''):
 
 
 class SonarrData:
-    _detail = {}
 
     def __init__(self, event):
         Logger.warning(event)
@@ -138,7 +137,6 @@ class SonarrData:
 
 
 class RadarrData:
-    _detail = {}
 
     def __init__(self, event):
         Logger.warning(event)
@@ -176,6 +174,10 @@ class RadarrData:
             self._detail['releaseGroup'] = event['release'].get('releaseGroup')
             self._detail['releaseTitle'] = event['release'].get('releaseTitle')
             self._detail['indexer'] = event['release'].get('indexer')
+        if event.get('movieFile'):
+            self._detail['quality'] = event['movieFile'].get('quality')
+            self._detail['size'] = event['movieFile'].get('size')
+            self._detail['releaseGroup'] = event['movieFile'].get('releaseGroup')
         self._detail['isUpgrade'] = event.get('isUpgrade')
         self._detail['deletedFiles'] = event.get('deletedFiles')
         if self._detail.get('imdbId'):
