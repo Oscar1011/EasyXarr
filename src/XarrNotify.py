@@ -66,8 +66,7 @@ class SonarrData:
             "HealthIssue": '',
             "Test": ''
         }
-
-        self._detail['eventType'] = event.get('eventType')
+        self._detail = {'eventType': event.get('eventType')}
 
         if event.get('series'):
             self._detail['id'] = event['series'].get('id')
@@ -156,8 +155,8 @@ class RadarrData:
             "HealthIssue": '',
             "Test": ''
         }
+        self._detail = {'eventType': event.get('eventType')}
 
-        self._detail['eventType'] = event.get('eventType')
         if event.get('movie'):
             self._detail['id'] = event['movie'].get('id')
             self._detail['title'] = event['movie'].get('title')
