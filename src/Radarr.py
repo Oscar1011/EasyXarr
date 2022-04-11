@@ -42,6 +42,7 @@ class Radarr:
                     self._search = Setting["Radarr"]["Search"]
                     self._minimum_availability = Setting["Radarr"]["MinimumAvailability"]
                     self._tag = Setting["Radarr"]["Tag"]
+                    self._auto_add = Setting["Radarr"]["AutoAdd"]
 
                     Logger.success("[Radarr初始化]配置加载完成")
                 except Exception:
@@ -143,6 +144,8 @@ class Radarr:
             Logger.error(Text)
         finally:
             self._is_running = False
+            if len(found_movies) == 1 and self._auto_add:
+                self._add_movies_internal(radarr_movies[0].tmdbId)
 
     def find_movie_by_tmdb(self, tmdb_id):
         tmdb.API_KEY = TMDB_KEY

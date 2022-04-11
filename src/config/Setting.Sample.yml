@@ -23,14 +23,16 @@ Others:
   #留空则会直接使用TMDB/TVDB等图片链接进行推送，国内网络环境可能无法加载显示
   ImageServer: ''
 TMDB:
-  #获取各榜单时过滤的偏好影片语言，不配置则不过滤，如 {zh,en}, 其他语言请搜索 ISO 639-1，根据列表增加即可
-  TVPreferLanguage: { }
-  #获取各榜单时过滤的偏好影片类型，类型id请对应 GENRE_ID_LIST.txt文件配置，不配置则不过滤， 如 {28,12,16,80}
-  TVPreferGenreId: { }
-  #获取各榜单时过滤的偏好影片语言，不配置则不过滤，如 {zh,en}, 其他语言请搜索 ISO 639-1，根据列表增加即可
-  MoviesPreferLanguage: { }
-  #获取各榜单时过滤的偏好影片类型，类型id请对应 GENRE_ID_LIST.txt文件配置，不配置则不过滤， 如 {28,12,16,80}
-  MoviesPreferGenreId: { }
+  TV:
+    #获取剧集榜单时过滤的偏好影片语言，不配置则不过滤，如 {zh,en}, 其他语言请搜索 ISO 639-1，根据列表增加即可
+    PreferLanguage: { }
+    #获取剧集榜单时过滤的偏好影片类型，类型id请对应 GENRE_ID_LIST.txt文件配置，不配置则不过滤， 如 {28,12,16,80}
+    PreferGenreId: { }
+  Movies:
+    #获取电影榜单时过滤的偏好影片语言，不配置则不过滤，如 {zh,en}, 其他语言请搜索 ISO 639-1，根据列表增加即可
+    PreferLanguage: { }
+    #获取电影榜单时过滤的偏好影片类型，类型id请对应 GENRE_ID_LIST.txt文件配置，不配置则不过滤， 如 {28,12,16,80}
+    PreferGenreId: { }
 Sonarr:
   #必须，Sonarr访问地址，格式 http(s)://xxx.xxx.xxx:port
   Host: ''
@@ -54,6 +56,8 @@ Sonarr:
   SeriesType: 'standard'
   #添加时自动带上标签，请勿使用纯数字，多个tag 使用 逗号分开 如： [中文,微信]
   Tag: []
+  #使用关键字搜索时若结果只有一个时自动添加到sonarr
+  AutoAdd: True
 Radarr:
   #Radarr 访问地址，格式 http(s)://xxx.xxx.xxx:port
   Host: ''
@@ -70,6 +74,8 @@ Radarr:
   MinimumAvailability: "announced"
   #添加时自动带上标签，请勿使用纯数字，多个tag 使用 逗号分开 如： [中文,微信]
   Tag: []
+  #使用关键字搜索时若结果只有一个时自动添加到sonarr
+  AutoAdd: True
 Service:
   Host: 0.0.0.0
   #服务端口

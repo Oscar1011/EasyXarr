@@ -45,6 +45,7 @@ class Sonarr:
                     self._unmet_search = Setting["Sonarr"]["UnmetSearch"]
                     self._series_type = Setting["Sonarr"]["SeriesType"]
                     self._tag = Setting["Sonarr"]["Tag"]
+                    self._auto_add = Setting["Sonarr"]["AutoAdd"]
                     Logger.success("[Sonarr初始化]配置加载完成")
                 except Exception:
                     ExceptionInformation = sys.exc_info()
@@ -139,6 +140,7 @@ class Sonarr:
                         Logger.info(series)
                         if len(found_series) >= 8:
                             break
+
                 push_image_text(found_series)
                 self._last_search_time = datetime.now()
             else:
@@ -150,6 +152,8 @@ class Sonarr:
             Logger.error(Text)
         finally:
             self._is_running = False
+            if len(found_series) == 1 and self._auto_add:
+                self._add_series_internal(tvdbId=sonarr_series[0].tvdbId)
 
     def find_tv_by_tvdb(self, tvdb_id):
         tmdb.API_KEY = TMDB_KEY

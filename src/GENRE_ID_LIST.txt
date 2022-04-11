@@ -1,7 +1,7 @@
 ==============================
 
 MOVIE
-行动	    28	    Action
+动作	    28	    Action
 冒险	    12	    Adventure
 动画	    16	    Animation
 喜剧	    35	    Comedy
@@ -34,7 +34,7 @@ TV SHOW
 儿童	        10762	Kids
 神秘	        9648	Mystery
 新闻	        10763	News
-现实	        10764	Reality
+真人秀	    10764	Reality
 科幻与奇幻	10765	Sci-Fi & Fantasy
 肥皂	        10766	Soap
 脱口秀       10767	Talk
