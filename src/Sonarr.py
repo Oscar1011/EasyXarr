@@ -53,12 +53,15 @@ class Sonarr:
                 Sonarr._init_flag = True
 
     @staticmethod
-    def add_series(tvdbId):
-        Sonarr()._add_series_internal(tvdbId)
+    def add_series(tvdbId=None, tmdbId=None):
+        Sonarr()._add_series_internal(tvdbId, tmdbId)
 
     @staticmethod
     def search(name):
         Sonarr()._search_internal(name)
+
+    def get_all_series(self):
+        return self._sonarr.all_series()
 
     def is_exist(self, tvdb_id=None):
         try:
@@ -70,7 +73,7 @@ class Sonarr:
             return False
         return False
 
-    def _add_series_internal(self, tvdbId: int):
+    def _add_series_internal(self, tvdbId: int, tmdbId: int = None):
         if self._is_running:
             Push(Message='Sonarr正在搜索或添加剧集')
             return
@@ -81,6 +84,11 @@ class Sonarr:
                 Logger.error('距上次搜索间隔时间太久，请重新搜索后尝试添加')
                 Push(Message='🛑距上次搜索间隔时间太久，请重新搜索后尝试添加')
                 return
+            if tmdbId:
+                tmdb.API_KEY = TMDB_KEY
+                id_info = tmdb.TV(tmdbId).external_ids(language='zh')
+                if id_info.get('tvdb_id'):
+                    tvdbId = id_info.get('tvdb_id')
             sonarr_series = self._sonarr.get_series(tvdb_id=tvdbId)
             if sonarr_series:
                 tv = self.find_tv_by_tvdb(tvdbId)

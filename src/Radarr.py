@@ -58,6 +58,9 @@ class Radarr:
     def search(name):
         Radarr()._search_internal(name)
 
+    def get_all_movies(self):
+        return self._radarr.all_movies()
+
     def is_exist(self, tmdb_id=None, imdb_id=None):
         try:
             movie = self._radarr.get_movie(tmdb_id=tmdb_id, imdb_id=imdb_id)

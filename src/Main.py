@@ -68,8 +68,9 @@ def addSeries():
             Logger.error(f'异常访问添加剧集，请求 apikey 错误')
             return ''
         tvdbId = request.args.get("tvdbId")
+        tmdbId = request.args.get("tmdbId")
         Logger.info(f'[添加剧集] tvdbId={tvdbId}')
-        t = threading.Thread(target=Sonarr.add_series, name="Thread-addSeries", kwargs={'tvdbId': tvdbId})
+        t = threading.Thread(target=Sonarr.add_series, name="Thread-addSeries", kwargs={'tvdbId': tvdbId,'tmdbId':tmdbId})
         t.start()
         return '已请求添加'
     except:

@@ -14,6 +14,7 @@ tmdb.API_KEY = TMDB_KEY
 TV = 1
 MOVIE = 2
 
+
 def movies_now_playing():
     movies = tmdb.Movies()
     _push_movies(get_list(movies.now_playing, MOVIE))
@@ -83,13 +84,20 @@ def filter_list(tmdb_list, prefer_language, prefer_genre_id):
 def _push_movies(movies):
     moviesinfo = []
     radarr = Radarr()
+    radarr_movies = radarr.get_all_movies()
+
     for i in range(len(movies)):
         if i == 0 and movies[i]["backdrop_path"] != 'None':
             picurl = f'https://image.tmdb.org/t/p/original/{movies[i]["backdrop_path"]}'
         else:
             picurl = f'https://image.tmdb.org/t/p/original/{movies[i]["poster_path"]}'
+        tmplist = filter(lambda x: x.tmdbId == movies[i]['id'], radarr_movies)
+        if len(list(tmplist)) > 0:
+            exist = True
+        else:
+            exist = False
         info = {
-            'title': f"{movies[i]['title']}\n🔸{movies[i]['vote_average'] if movies[i]['vote_count'] > 10 else '暂无评'}分 {'| ✅已入库' if radarr.is_exist(tmdb_id=movies[i]['id']) else '| ❎未入库'}",
+            'title': f"{movies[i]['title']}\n🔸{movies[i]['vote_average'] if movies[i]['vote_count'] > 10 else '暂无评'}分 {'| ✅已入库' if exist else '| ❎未入库'}",
             'url': f"{WXHOST}/addMovie?apikey={WXHOST_APIKEY}&tmdbId={movies[i]['id']}",
             'picurl': picurl,
             'message': movies[i]['overview']}
@@ -106,19 +114,29 @@ def _push_movies(movies):
 def _push_tv(tmdb_tv):
     tv_info = []
     sonarr = Sonarr()
-    for i in range(len(tmdb_tv)):
-        id_info = tmdb.TV(tmdb_tv[i]["id"]).external_ids(language='zh')
-        if id_info.get('tvdb_id'):
-            if i == 0 and tmdb_tv[i]["backdrop_path"] != 'None':
-                picurl = f'https://image.tmdb.org/t/p/original/{tmdb_tv[i]["backdrop_path"]}'
-            else:
-                picurl = f'https://image.tmdb.org/t/p/original/{tmdb_tv[i]["poster_path"]}'
-            info = {
-                'title': f"{tmdb_tv[i]['name']}\n🔸{tmdb_tv[i]['vote_average'] if tmdb_tv[i]['vote_count'] > 10 else '暂无评'}分 {'| ✅已入库' if sonarr.is_exist(tvdb_id=id_info['tvdb_id']) else '| ❎未入库'}",
-                'url': f'{WXHOST}/addSeries?apikey={WXHOST_APIKEY}&tvdbId={id_info["tvdb_id"]}',
-                'picurl': picurl,
-                'message': tmdb_tv[i]['overview']}
-            tv_info.append(info)
+    sonarr_series = sonarr.get_all_series()
+    for i, tmp_series in enumerate(tmdb_tv):
+        id_info = tmdb.TV(tmp_series["id"]).external_ids()
+        tmp_series['tvdb_id'] = id_info.get('tvdb_id')
+        if i == 8:
+            break
+
+    for i, tmp_series in enumerate(tmdb_tv):
+        if i == 0 and tmp_series["backdrop_path"] != 'None':
+            picurl = f'https://image.tmdb.org/t/p/original/{tmp_series["backdrop_path"]}'
+        else:
+            picurl = f'https://image.tmdb.org/t/p/original/{tmp_series["poster_path"]}'
+        tmplist = filter(lambda x: x.tvdbId == tmp_series.get('tvdb_id', -1), sonarr_series)
+        if len(list(tmplist)) > 0:
+            exist = True
+        else:
+            exist = False
+        info = {
+            'title': f"{tmp_series['name']}\n🔸{tmp_series['vote_average'] if tmp_series['vote_count'] > 10 else '暂无评'}分 {'| ✅已入库' if exist else '| ❎未入库'}",
+            'url': f'{WXHOST}/addSeries?apikey={WXHOST_APIKEY}&tvdbId={tmp_series["tvdb_id"]}',
+            'picurl': picurl,
+            'message': tmp_series['overview']}
+        tv_info.append(info)
 
         if len(tv_info) >= 8:
             break
