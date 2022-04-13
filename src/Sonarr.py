@@ -132,7 +132,7 @@ class Sonarr:
                         else:
                             picurl = f'{self.get_remote_url(series.images)}'
                         series = {
-                            'title': f"{tmdb_series[0]['name']}\n🔸{tmdb_series[0]['vote_average'] if tmdb_series[0]['vote_count'] > 10 else '暂无评'}分 {'| ✅已入库' if series.id is None else '| ❎未入库'}",
+                            'title': f"{tmdb_series[0]['name']}\n🔸{tmdb_series[0]['vote_average'] if tmdb_series[0]['vote_count'] > 10 else '暂无评'}分 {'| ❎未入库' if series.id is None else '| ✅已入库'}",
                             'picurl': picurl,
                             'url': f'{WXHOST}/addSeries?apikey={WXHOST_APIKEY}&tvdbId={series.tvdbId}',
                             'message': tmdb_series[0]['overview']}

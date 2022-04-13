@@ -124,7 +124,7 @@ class Radarr:
                             picurl = f'{self.get_remote_url(movies.images)}'
 
                         info = {
-                            'title': f"{tmdb_movies[0]['title']}\n🔸{tmdb_movies[0]['vote_average'] if tmdb_movies[0]['vote_count'] > 10 else '暂无评'}分 {'| ✅已入库' if movies.id is None else '| ❎未入库'}",
+                            'title': f"{tmdb_movies[0]['title']}\n🔸{tmdb_movies[0]['vote_average'] if tmdb_movies[0]['vote_count'] > 10 else '暂无评'}分 {'| ❎未入库' if movies.id is None else '| ✅已入库'}",
                             'url': f'{WXHOST}/addMovie?apikey={WXHOST_APIKEY}&tmdbId={movies.tmdbId}',
                             'picurl': picurl,
                             'message': tmdb_movies[0]['overview']}
