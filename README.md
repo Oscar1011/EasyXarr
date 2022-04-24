@@ -7,7 +7,7 @@
     version: "3.8"
     services:
       easy_xarr:
-        image: oscar1011/easy_xarr
+        image: oscar1011/easy_xarr:main
         container_name: easy_xarr
         network_mode: "bridge"
         ports:
