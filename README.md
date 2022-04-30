@@ -47,7 +47,8 @@ or
 ![basic](https://gitee.com/oscar1011/raw/raw/master/easyxarr/20220410144708.jpg)
 ![basic](https://gitee.com/oscar1011/raw/raw/master/easyxarr/20220410144718.jpg) 
 
-
+# 开源许可
+本项目使用 [GPL-3.0](https://choosealicense.com/licenses/gpl-3.0/) 作为开源许可证。
 
 # 鸣谢
  部分代码使用了 [SeaBot_WX 项目](https://github.com/B1ue1nWh1te/SeaBot_WX)
