@@ -28,9 +28,9 @@ def push_msg_from_detail(detail, title_prefix=''):
     # if detail.get('path'):
     #     msg += '\n文件路径：' + detail['path']
     if detail.get('isUpgrade'):
-        msg += '\n格式升级：' + ('是' if 'True' == detail['isUpgrade'] else '否')
+        msg += '\n格式升级：' + ('是' if detail['isUpgrade'] else '否')
     if detail.get('deletedFiles'):
-        msg += '\n删除文件：' + ('是' if 'True' == detail['deletedFiles'] else '否')
+        msg += '\n删除文件：' + ('是' if len(detail['deletedFiles']) > 0 else '否')
     if detail.get('indexer'):
         msg += '\n抓取来源：' + detail['indexer']
 
