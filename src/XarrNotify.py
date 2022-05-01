@@ -27,6 +27,10 @@ def push_msg_from_detail(detail, title_prefix=''):
         msg += '\n视频大小：' + HRS(int(detail['size']))
     # if detail.get('path'):
     #     msg += '\n文件路径：' + detail['path']
+    if detail.get('airDate'):
+        msg += '\n播出日期：' + detail['airDate']
+    if detail.get('releaseDate'):
+        msg += '\n上映日期：' + detail['releaseDate']
     if detail.get('isUpgrade'):
         msg += '\n格式升级：' + ('是' if detail['isUpgrade'] else '否')
     if detail.get('deletedFiles'):
@@ -82,6 +86,7 @@ class SonarrData:
             # self._detail['seasonNumber'] = event['episodes'][0].get('seasonNumber')
             episode_number = map(lambda x: str(x['episodeNumber']), event['episodes'])
             self._detail['episodeNumbers'] = ','.join(list(episode_number))
+            self._detail['airDate'] = event['episodes'][0].get('airDate')
         if event.get('release'):
             self._detail['size'] = event['release'].get('size')
             self._detail['releaseGroup'] = event['release'].get('releaseGroup')
@@ -100,7 +105,10 @@ class SonarrData:
             find.info(external_source='imdb_id', language='zh')
             if len(find.tv_results) > 0:
                 self._detail['title'] = find.tv_results[0]['name']
-                self._detail['backUrl'] = f'https://image.tmdb.org/t/p/original/{find.tv_results[0]["backdrop_path"]}'
+                if find.tv_results[0]["backdrop_path"] != 'None':
+                    self._detail['backUrl'] = f'https://image.tmdb.org/t/p/original/{find.tv_results[0]["backdrop_path"]}'
+                elif find.tv_results[0]["poster_path"] != 'None':
+                    self._detail['backUrl'] = f'https://image.tmdb.org/t/p/original/{find.tv_results[0]["poster_path"]}'
 
     def grab(self):
         push_msg_from_detail(self._detail, self.title_prefix.get(self._detail.get('eventType')))
@@ -177,6 +185,7 @@ class RadarrData:
             self._detail['quality'] = event['movieFile'].get('quality')
             self._detail['size'] = event['movieFile'].get('size')
             self._detail['releaseGroup'] = event['movieFile'].get('releaseGroup')
+            self._detail['indexerFlags'] = event['movieFile'].get('indexerFlags')
         self._detail['isUpgrade'] = event.get('isUpgrade')
         self._detail['deletedFiles'] = event.get('deletedFiles')
         if self._detail.get('imdbId'):
@@ -185,8 +194,12 @@ class RadarrData:
             find.info(external_source='imdb_id', language='zh')
             if len(find.movie_results) > 0:
                 self._detail['title'] = find.movie_results[0]['title']
-                self._detail[
-                    'backUrl'] = f'https://image.tmdb.org/t/p/original/{find.movie_results[0]["backdrop_path"]}'
+                if find.movie_results[0]["backdrop_path"] != 'None':
+                    self._detail[
+                        'backUrl'] = f'https://image.tmdb.org/t/p/original/{find.movie_results[0]["backdrop_path"]}'
+                elif find.movie_results[0]["poster_path"] != 'None':
+                    self._detail[
+                        'backUrl'] = f'https://image.tmdb.org/t/p/original/{find.movie_results[0]["poster_path"]}'
 
     def grab(self):
         push_msg_from_detail(self._detail, self.title_prefix.get(self._detail.get('eventType')))

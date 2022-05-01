@@ -91,8 +91,11 @@ def QWX():
             echostr = request.args.get("echostr")
             QWX_Crypt = WXBizMsgCrypt(QWX_Token, QWX_EncodingAESKey, CorpID)
             ret, result = QWX_Crypt.VerifyURL(msg_signature, timestamp, nonce, echostr)
-            print(f"{ret}\n{result}")
-            return result
+            if ret == 0:
+                return result
+            else:
+                Logger.error(f"GET请求异常{ret}{result}")
+                return ''
 
         # ---接收消息---
         msg_signature = request.args.get("msg_signature")
