@@ -47,6 +47,9 @@ or
 ![basic](https://gitee.com/oscar1011/raw/raw/master/easyxarr/20220410144708.jpg)
 ![basic](https://gitee.com/oscar1011/raw/raw/master/easyxarr/20220410144718.jpg) 
 
+# 交流
+[tg群](https://t.me/+6o1Wo7ktTR4yYWU1)
+
 # 开源许可
 本项目使用 [GPL-3.0](https://choosealicense.com/licenses/gpl-3.0/) 作为开源许可证。
 
