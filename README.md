@@ -4,6 +4,14 @@
 # 使用说明
 修改Setting.Sample.yml配置文件， 映射到 /app/config/Setting.yml
 
+- 一键启动命令
+  
+
+    docker run -d -p 8000:8000 --name=easy_xarr --add-host=api.themoviedb.org:13.224.161.90 --add-host=api.themoviedb.org:13.35.67.86 -v /docker/config/Setting.yml:/app/config/Setting.yml oscar1011/easy_xarr:main
+
+- composer配置
+  
+
     version: "3.8"
     services:
       easy_xarr:
