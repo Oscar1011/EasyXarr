@@ -5,26 +5,28 @@
 修改Setting.Sample.yml配置文件， 映射到 /app/config/Setting.yml
 
 - 一键启动命令
-  
 
-    docker run -d -p 8000:8000 --name=easy_xarr --add-host=api.themoviedb.org:13.224.161.90 --add-host=api.themoviedb.org:13.35.67.86 -v /docker/config/Setting.yml:/app/config/Setting.yml oscar1011/easy_xarr:main
+
+
+      docker run -d -p 8000:8000 --name=easy_xarr --add-host=api.themoviedb.org:13.224.161.90 --add-host=api.themoviedb.org:13.35.67.86 -v /docker/config/Setting.yml:/app/config/Setting.yml oscar1011/easy_xarr:main
 
 - composer配置
-  
 
-    version: "3.8"
-    services:
-      easy_xarr:
-        image: oscar1011/easy_xarr:main
-        container_name: easy_xarr
-        network_mode: "bridge"
-        ports:
-          - "8000:8000"
-        volumes:
-          - /docker/config/Setting.yml:/app/config/Setting.yml
-        extra_hosts:
-          - "api.themoviedb.org:13.224.161.90"
-          - "api.themoviedb.org:13.35.67.86"
+
+
+      version: "3.8"
+      services:
+        easy_xarr:
+          image: oscar1011/easy_xarr:main
+          container_name: easy_xarr
+          network_mode: "bridge"
+          ports:
+            - "8000:8000"
+          volumes:
+            - /docker/config/Setting.yml:/app/config/Setting.yml
+          extra_hosts:
+            - "api.themoviedb.org:13.224.161.90"
+            - "api.themoviedb.org:13.35.67.86"
 
 开启企业微信应用的api接收消息，获取的Token与EncodingAESKey 填入Setting.yml中重启 easy_xarr 服务。再在api接收消息配置界面点击保存。
 
