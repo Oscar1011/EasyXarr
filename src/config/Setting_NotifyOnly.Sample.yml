@@ -1,0 +1,20 @@
+#纯通知版配置，使用时请修改文件名为Setting.yml
+EnterpriseWechat:
+  #企业微信通知参数，配置参见 https://developer.work.weixin.qq.com/document/path/90665
+  CorpID: ''
+  CorpSecret: ''
+  AgentID: ''
+  ManagerID: '@all'
+  TokenApi: https://qyapi.weixin.qq.com/cgi-bin/gettoken
+  PushApi: https://qyapi.weixin.qq.com/cgi-bin/message/send
+  #推送时的默认title
+  PushTitle: 'EasyXArr'
+Others:
+  #调用通知时用于验证的秘钥。防止被人恶意操作，请修改为任意字符串
+  WxHostApiKey: 'X5h*oF734F7n@$'
+  #必须，TMDB的apikey，官网注册申请 https://www.themoviedb.org/
+  TMDBApiKey: ''
+Service:
+  Host: 0.0.0.0
+  #服务端口
+  Port: 8000

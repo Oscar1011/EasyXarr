@@ -10,8 +10,6 @@ try:
     Host = Setting["Service"]["Host"]
     Port = Setting["Service"]["Port"]
 
-    QWX_Token = Setting["EnterpriseWechat"]["Token"]
-    QWX_EncodingAESKey = Setting["EnterpriseWechat"]["EncodingAESKey"]
     CorpID = Setting["EnterpriseWechat"]["CorpID"]
     CorpSecret = Setting["EnterpriseWechat"]["CorpSecret"]
     AgentID = Setting["EnterpriseWechat"]["AgentID"]
@@ -20,15 +18,9 @@ try:
     PushApi = Setting["EnterpriseWechat"]["PushApi"]
     PushTitle = Setting["EnterpriseWechat"]["PushTitle"]
 
-    IMAGE_SERVER = Setting["Others"]["ImageServer"]
-    WXHOST = Setting["Others"]["WxHost"]
     WXHOST_APIKEY = Setting["Others"]["WxHostApiKey"]
     TMDB_KEY = Setting["Others"]["TMDBApiKey"]
 
-    TV_PREFER_LANGUAGE = Setting["TMDB"]["TV"]["PreferLanguage"]
-    TV_PREFER_GENRE_ID = Setting["TMDB"]["TV"]["PreferGenreId"]
-    MOVIES_PREFER_LANGUAGE = Setting["TMDB"]["Movies"]["PreferLanguage"]
-    MOVIES_PREFER_GENRE_ID = Setting["TMDB"]["Movies"]["PreferGenreId"]
     Logger.success("[主程序初始化]配置加载完成")
 except Exception:
     ExceptionInformation = sys.exc_info()
