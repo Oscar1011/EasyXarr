@@ -117,6 +117,7 @@ class Sonarr:
             return
         self._is_running = True
         try:
+            Push(Message=f'开始搜索 {name}')
             sonarr_series = self._sonarr.search_series(name)
             Logger.info(sonarr_series)
             found_series = []
@@ -132,7 +133,7 @@ class Sonarr:
                         else:
                             picurl = f'{self.get_remote_url(series.images)}'
                         series = {
-                            'title': f"{tmdb_series[0]['name']}\n🔸{tmdb_series[0]['vote_average'] if tmdb_series[0]['vote_count'] > 10 else '暂无评'}分 {'| ❎未入库' if series.id is None else '| ✅已入库'}",
+                            'title': f"{tmdb_series[0]['name']}({tmdb_series[0]['first_air_date'].split('-')[0]})\n🔸{tmdb_series[0]['vote_average'] if tmdb_series[0]['vote_count'] > 10 else '暂无评'}分 {'| ❎未入库' if series.id is None else '| ✅已入库'}",
                             'picurl': picurl,
                             'url': f'{WXHOST}/addSeries?apikey={WXHOST_APIKEY}&tvdbId={series.tvdbId}',
                             'message': tmdb_series[0]['overview']}

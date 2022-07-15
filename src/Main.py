@@ -118,14 +118,14 @@ def QWX():
                     t.start()
 
         elif MsgType == 'text':
-            Content = XmlTree.find("Content").text.split(" ")
+            Content = XmlTree.find("Content").text.split(" ", 1)
             Command = Content[0]
             if len(Content) == 2:
-                if Command == '电视剧':
+                if Command == '电视剧' or Command == 's':
                     name = Content[1]
                     t = threading.Thread(target=Sonarr.search, name="Sonarr-search", kwargs={'name': name})
                     t.start()
-                elif Command == '电影':
+                elif Command == '电影' or Command == 'm':
                     name = Content[1]
                     t = threading.Thread(target=Radarr.search, name="Radarr-search", kwargs={'name': name})
                     t.start()
