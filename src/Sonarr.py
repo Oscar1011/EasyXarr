@@ -50,6 +50,7 @@ class Sonarr:
                 except Exception:
                     ExceptionInformation = sys.exc_info()
                     Text = f'[Sonarr初始化异常]异常信息为:{ExceptionInformation}'
+                    Push(Message='Sonarr初始化异常, 请检查Sonarr状态和日志确认问题')
                     Logger.error(Text)
                 Sonarr._init_flag = True
 
@@ -118,9 +119,9 @@ class Sonarr:
         self._is_running = True
         try:
             Push(Message=f'开始搜索 {name}')
+            found_series = []
             sonarr_series = self._sonarr.search_series(name)
             Logger.info(sonarr_series)
-            found_series = []
             if sonarr_series and len(sonarr_series) >= 1:
                 for series in sonarr_series:
                     tmdb_series = self.find_tv_by_imdb(series.imdbId)

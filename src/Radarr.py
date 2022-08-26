@@ -48,6 +48,7 @@ class Radarr:
                 except Exception:
                     ExceptionInformation = sys.exc_info()
                     Text = f'[Radarr初始化异常]异常信息为:{ExceptionInformation}'
+                    Push(Message='Radarr初始化异常, 请检查Radarr状态和日志确认问题')
                     Logger.error(Text)
                 Radarr._init_flag = True
 
@@ -108,9 +109,9 @@ class Radarr:
             return
         self._is_running = True
         try:
+            found_movies = []
             radarr_movies = self._radarr.search_movies(name)
             Logger.info(radarr_movies)
-            found_movies = []
             if radarr_movies and len(radarr_movies) >= 1:
                 for movies in radarr_movies:
                     tmdb_movies = self.find_movie_by_imdb(movies.imdbId)
